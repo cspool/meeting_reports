@@ -1,0 +1,340 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>input7_layer0 · 负载分析</title><style>
+body{font-family:system-ui,-apple-system,"Noto Sans CJK SC","PingFang SC",sans-serif;max-width:1100px;margin:40px auto;padding:0 24px;color:#182536;background:#f5f7fa;line-height:1.65}
+section,article{background:#fff;border:1px solid #dce2e8;border-radius:12px;padding:24px 28px;margin:20px 0}
+h1{font-size:1.6em}h2{font-size:1.3em;border-bottom:1px solid #e3e8ee;padding-bottom:6px;margin-top:1.6em}h3{font-size:1.1em;margin-top:1.4em}
+a{color:#1765ad;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:#eef2f6;padding:1px 5px;border-radius:4px}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.45}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre.diagram{background:#fbfcfd;color:#182536;border:1px solid #dce2e8}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.93em}th,td{border:1px solid #dce2e8;padding:6px 10px;text-align:left;vertical-align:top}th{background:#eef2f6}
+nav.top{font-size:.9em;margin-bottom:12px}nav.top a{margin-right:14px}
+.muted{color:#5b6b7c;font-size:.9em}.tag{display:inline-block;background:#eef2f6;border-radius:999px;padding:1px 10px;font-size:.8em;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{border:1px solid #dce2e8;border-radius:10px;padding:14px 16px;background:#fbfcfd}.card h3{margin:0 0 6px;font-size:1.02em}
+.toc{columns:2;column-gap:32px;font-size:.92em}.toc li{break-inside:avoid}
+</style></head><body><nav class="top"><a href="../index.html">← 负载分析索引</a><a href="input6_layer63.html">‹ input6_layer63</a><a href="input7_layer3.html">input7_layer3 ›</a><a href="#recon">生成式重建</a><a href="#vis">手工可视化</a></nav><h1>input7_layer0 <span class="tag">selected:06</span></h1><p class="muted">linear_attention · decode · q/past/kv = 1/20585/20586 · 74 FX nodes / 9 processes</p><p class="muted">原始文件：<a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_process_reconstruction.md">fx_process_reconstruction.md</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_process_visualization.md">fx_process_visualization.md</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_process_reconstruction.json">fx_process_reconstruction.json</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_process_nodes.csv">fx_process_nodes.csv</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_graph.py">fx_graph.py</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0/fx_nodes.json">fx_nodes.json</a></p><article id="recon"><h1>A. 生成式 Process 重建（fx_process_reconstruction.md）</h1><h1 id="FX-Layer-Process-Reconstruction">FX Layer Process Reconstruction</h1>
+<p>Event: <code>input7_layer0</code> (<code>selected:06</code>) Source event: <code>chatcmpl-bench-7f1746b7-0-9eeec82b|s7|f7|l0|o0</code> Observed path: <code>linear_attention</code>, phase <code>decode</code>, q/past/kv = <code>1/20585/20586</code> Trace directory: <code>/public/home/tangyu408/Qwen_DCU_Worker_0/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer0</code> GraphModule provenance: <code>fx_graph_module.pt</code> (SHA-256 <code>aca9b2ed1db8d50fcd1c81b7839d5f275f7bbccc1db57629768751303ad64add</code>) Capture-time nodes: <code>fx_nodes.json</code> (SHA-256 <code>45d62630342fcbc660c79b76cd33686b297c7ad0ff91ed76f34db05e6afddd3a</code>)</p>
+<p>Source: rule reconstruction over the capture-time serialization of <code>GraphModule.graph.nodes</code>; the meta-storage GraphModule is not executed. Process labels are target-specific reconstruction labels, not FX metadata or proof of runtime module ownership. Opaque vLLM/ROCm/DCU custom-op nodes expose only their observed call and mutation boundary; their internal kernels are not reconstructed.</p>
+<h2 id="Stage-Summary">Stage Summary</h2>
+<table><thead><tr><th>stage</th><th>rule</th><th>node range</th><th>count</th><th>external inputs</th><th>external outputs</th></tr></thead><tbody><tr><td>Runtime FX inputs</td><td>contiguous placeholder prefix</td><td>0-2</td><td>3</td><td>-</td><td><code>arg1_1</code></td></tr><tr><td>Input RMSNorm</td><td>nodes after placeholders through the node before the first mixer projection weight</td><td>3-15</td><td>13</td><td><code>arg1_1</code></td><td><code>_to_copy_2</code>, <code>empty_like</code></td></tr><tr><td>Attention/GDN input projections and head reshape</td><td>first mixer projection weight through the node before the family landmark (RoPE table or GDN custom op)</td><td>16-29</td><td>14</td><td><code>_to_copy_2</code></td><td><code>getitem</code>, <code>view</code>, <code>getitem_2</code>, <code>getitem_3</code>, <code>zeros</code></td></tr><tr><td>Gated DeltaNet recurrent core</td><td>single opaque vllm.gdn_attention_core call</td><td>30-30</td><td>1</td><td><code>getitem</code>, <code>getitem_2</code>, <code>getitem_3</code>, <code>zeros</code></td><td>-</td></tr><tr><td>Gated DeltaNet output RMSNorm and SiLU gate</td><td>observed core-output reshape, RMS normalization, SiLU Z gate, and head merge before the mixer output projection</td><td>31-47</td><td>17</td><td><code>view</code>, <code>zeros</code></td><td><code>view_4</code></td></tr><tr><td>Mixer output projection and residual</td><td>mixer output projection weight through output-buffer copy and observed residual add</td><td>48-54</td><td>7</td><td><code>arg1_1</code>, <code>empty_like</code>, <code>view_4</code></td><td><code>detach_1</code>, <code>add_3</code></td></tr><tr><td>Post-attention RMSNorm</td><td>nodes after mixer residual add through the normalized MLP input</td><td>55-64</td><td>10</td><td><code>detach_1</code>, <code>add_3</code></td><td><code>_to_copy_9</code></td></tr><tr><td>Gated MLP projections</td><td>gate/up projection weight, fused SiLU-product boundary, and down projection through the node before graph output</td><td>65-72</td><td>8</td><td><code>_to_copy_9</code></td><td><code>mm_4</code></td></tr><tr><td>Layer output</td><td>single FX output node</td><td>73-73</td><td>1</td><td><code>add_3</code>, <code>mm_4</code></td><td>-</td></tr></tbody></table>
+<h2 id="Process-Code">Process Code</h2>
+<h3 id="Runtime-FX-inputs">Runtime FX inputs</h3>
+<pre><code># placeholder arg0_1
+# placeholder arg1_1
+# placeholder arg2_1</code></pre>
+<h3 id="Input-RMSNorm">Input RMSNorm</h3>
+<pre><code>_param_constant0 = self._param_constant0
+detach = aten.detach.default(_param_constant0,)
+_to_copy = aten._to_copy.default(arg1_1,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_1 = aten.pow.Tensor_Scalar(_to_copy, 2)
+mean = aten.mean.dim(pow_1, [-1], True)
+add = aten.add.Tensor(mean, 1e-06)
+rsqrt = aten.rsqrt.default(add,)
+mul = aten.mul.Tensor(_to_copy, rsqrt)
+_to_copy_1 = aten._to_copy.default(detach,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_1 = aten.add.Tensor(_to_copy_1, 1.0)
+mul_1 = aten.mul.Tensor(mul, add_1)
+_to_copy_2 = aten._to_copy.default(mul_1,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}
+empty_like = aten.empty_like.default(_to_copy_2,)  # kwargs={&#x27;pin_memory&#x27;: False}</code></pre>
+<h3 id="Attention-GDN-input-projections-and-head-reshape">Attention/GDN input projections and head reshape</h3>
+<pre><code>_param_constant1 = self._param_constant1
+t = aten.t.default(_param_constant1,)
+mm = aten.mm.default(_to_copy_2, t)
+split_with_sizes = aten.split_with_sizes.default(mm, [10240, 6144], -1)
+getitem = &lt;built-in function getitem&gt;(split_with_sizes, 0)
+getitem_1 = &lt;built-in function getitem&gt;(split_with_sizes, 1)
+view = aten.view.default(getitem_1, [1, -1, 128])
+_param_constant2 = self._param_constant2
+t_1 = aten.t.default(_param_constant2,)
+mm_1 = aten.mm.default(_to_copy_2, t_1)
+split = aten.split.Tensor(mm_1, 48, -1)
+getitem_2 = &lt;built-in function getitem&gt;(split, 0)
+getitem_3 = &lt;built-in function getitem&gt;(split, 1)
+zeros = aten.zeros.default([1, 48, 128],)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16, &#x27;device&#x27;: device(type=&#x27;cuda&#x27;, index=0), &#x27;pin_memory&#x27;: False}</code></pre>
+<h3 id="Gated-DeltaNet-recurrent-core">Gated DeltaNet recurrent core</h3>
+<pre><code>gdn_attention_core = vllm.gdn_attention_core.default(getitem, getitem_2, getitem_3, zeros, &#x27;language_model.model.layers.0.linear_attn&#x27;)</code></pre>
+<h3 id="Gated-DeltaNet-output-RMSNorm-and-SiLU-gate">Gated DeltaNet output RMSNorm and SiLU gate</h3>
+<pre><code>view_1 = aten.view.default(zeros, [-1, 128])
+view_2 = aten.view.default(view, [-1, 128])
+_to_copy_3 = aten._to_copy.default(view_1,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+_param_constant3 = self._param_constant3
+_to_copy_4 = aten._to_copy.default(_param_constant3,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+_to_copy_5 = aten._to_copy.default(view_2,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_2 = aten.pow.Tensor_Scalar(_to_copy_3, 2)
+mean_1 = aten.mean.dim(pow_2, [-1], True)
+add_2 = aten.add.Tensor(mean_1, 1e-06)
+rsqrt_1 = aten.rsqrt.default(add_2,)
+mul_2 = aten.mul.Tensor(_to_copy_3, rsqrt_1)
+mul_3 = aten.mul.Tensor(mul_2, _to_copy_4)
+silu = aten.silu.default(_to_copy_5,)
+mul_4 = aten.mul.Tensor(mul_3, silu)
+_to_copy_6 = aten._to_copy.default(mul_4,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}
+view_3 = aten.view.default(_to_copy_6, [1, 48, 128])
+view_4 = aten.view.default(view_3, [1, 6144])</code></pre>
+<h3 id="Mixer-output-projection-and-residual">Mixer output projection and residual</h3>
+<pre><code>_param_constant4 = self._param_constant4
+t_2 = aten.t.default(_param_constant4,)
+mm_2 = aten.mm.default(view_4, t_2)
+copy_ = aten.copy_.default(empty_like, mm_2)
+_param_constant5 = self._param_constant5
+detach_1 = aten.detach.default(_param_constant5,)
+add_3 = aten.add.Tensor(copy_, arg1_1)</code></pre>
+<h3 id="Post-attention-RMSNorm">Post-attention RMSNorm</h3>
+<pre><code>_to_copy_7 = aten._to_copy.default(add_3,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_3 = aten.pow.Tensor_Scalar(_to_copy_7, 2)
+mean_2 = aten.mean.dim(pow_3, [-1], True)
+add_4 = aten.add.Tensor(mean_2, 1e-06)
+rsqrt_2 = aten.rsqrt.default(add_4,)
+mul_5 = aten.mul.Tensor(_to_copy_7, rsqrt_2)
+_to_copy_8 = aten._to_copy.default(detach_1,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_5 = aten.add.Tensor(_to_copy_8, 1.0)
+mul_6 = aten.mul.Tensor(mul_5, add_5)
+_to_copy_9 = aten._to_copy.default(mul_6,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}</code></pre>
+<h3 id="Gated-MLP-projections">Gated MLP projections</h3>
+<pre><code>_param_constant6 = self._param_constant6
+t_3 = aten.t.default(_param_constant6,)
+mm_3 = aten.mm.default(_to_copy_9, t_3)
+empty = aten.empty.memory_format([1, 17408],)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16, &#x27;device&#x27;: device(type=&#x27;cuda&#x27;, index=0), &#x27;pin_memory&#x27;: False}
+silu_and_mul = _C.silu_and_mul.default(empty, mm_3)
+_param_constant7 = self._param_constant7
+t_4 = aten.t.default(_param_constant7,)
+mm_4 = aten.mm.default(empty, t_4)</code></pre>
+<h3 id="Layer-output">Layer output</h3>
+<pre><code>return ((mm_4, add_3),)</code></pre>
+<h2 id="Node-Table">Node Table</h2>
+<table><thead><tr><th>index</th><th>stage</th><th>name</th><th>op</th><th>target</th><th>shape</th><th>dtype</th><th>args</th><th>users</th></tr></thead><tbody><tr><td>0</td><td><code>inputs</code></td><td><code>arg0_1</code></td><td><code>placeholder</code></td><td><code>arg0_1</code></td><td><code>[3, 1]</code></td><td><code>int64</code></td><td>-</td><td>-</td></tr><tr><td>1</td><td><code>inputs</code></td><td><code>arg1_1</code></td><td><code>placeholder</code></td><td><code>arg1_1</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>_to_copy</code>, <code>add_3</code></td></tr><tr><td>2</td><td><code>inputs</code></td><td><code>arg2_1</code></td><td><code>placeholder</code></td><td><code>arg2_1</code></td><td><code>-</code></td><td><code>-</code></td><td>-</td><td>-</td></tr><tr><td>3</td><td><code>input_rmsnorm</code></td><td><code>_param_constant0</code></td><td><code>get_attr</code></td><td><code>_param_constant0</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach</code></td></tr><tr><td>4</td><td><code>input_rmsnorm</code></td><td><code>detach</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant0</code></td><td><code>_to_copy_1</code></td></tr><tr><td>5</td><td><code>input_rmsnorm</code></td><td><code>_to_copy</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>arg1_1</code></td><td><code>mul</code>, <code>pow_1</code></td></tr><tr><td>6</td><td><code>input_rmsnorm</code></td><td><code>pow_1</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy</code></td><td><code>mean</code></td></tr><tr><td>7</td><td><code>input_rmsnorm</code></td><td><code>mean</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>pow_1</code></td><td><code>add</code></td></tr><tr><td>8</td><td><code>input_rmsnorm</code></td><td><code>add</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>mean</code></td><td><code>rsqrt</code></td></tr><tr><td>9</td><td><code>input_rmsnorm</code></td><td><code>rsqrt</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>add</code></td><td><code>mul</code></td></tr><tr><td>10</td><td><code>input_rmsnorm</code></td><td><code>mul</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy</code>, <code>rsqrt</code></td><td><code>mul_1</code></td></tr><tr><td>11</td><td><code>input_rmsnorm</code></td><td><code>_to_copy_1</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>detach</code></td><td><code>add_1</code></td></tr><tr><td>12</td><td><code>input_rmsnorm</code></td><td><code>add_1</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>_to_copy_1</code></td><td><code>mul_1</code></td></tr><tr><td>13</td><td><code>input_rmsnorm</code></td><td><code>mul_1</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>mul</code>, <code>add_1</code></td><td><code>_to_copy_2</code></td></tr><tr><td>14</td><td><code>input_rmsnorm</code></td><td><code>_to_copy_2</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>mul_1</code></td><td><code>empty_like</code>, <code>mm</code>, <code>mm_1</code></td></tr><tr><td>15</td><td><code>input_rmsnorm</code></td><td><code>empty_like</code></td><td><code>call_function</code></td><td><code>aten.empty_like.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_2</code></td><td><code>copy_</code></td></tr><tr><td>16</td><td><code>qkv_projection</code></td><td><code>_param_constant1</code></td><td><code>get_attr</code></td><td><code>_param_constant1</code></td><td><code>[16384, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t</code></td></tr><tr><td>17</td><td><code>qkv_projection</code></td><td><code>t</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[5120, 16384]</code></td><td><code>bfloat16</code></td><td><code>_param_constant1</code></td><td><code>mm</code></td></tr><tr><td>18</td><td><code>qkv_projection</code></td><td><code>mm</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 16384]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_2</code>, <code>t</code></td><td><code>split_with_sizes</code></td></tr><tr><td>19</td><td><code>qkv_projection</code></td><td><code>split_with_sizes</code></td><td><code>call_function</code></td><td><code>aten.split_with_sizes.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>mm</code></td><td><code>getitem</code>, <code>getitem_1</code></td></tr><tr><td>20</td><td><code>qkv_projection</code></td><td><code>getitem</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 10240]</code></td><td><code>bfloat16</code></td><td><code>split_with_sizes</code></td><td><code>gdn_attention_core</code></td></tr><tr><td>21</td><td><code>qkv_projection</code></td><td><code>getitem_1</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>split_with_sizes</code></td><td><code>view</code></td></tr><tr><td>22</td><td><code>qkv_projection</code></td><td><code>view</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 48, 128]</code></td><td><code>bfloat16</code></td><td><code>getitem_1</code></td><td><code>view_2</code></td></tr><tr><td>23</td><td><code>qkv_projection</code></td><td><code>_param_constant2</code></td><td><code>get_attr</code></td><td><code>_param_constant2</code></td><td><code>[96, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_1</code></td></tr><tr><td>24</td><td><code>qkv_projection</code></td><td><code>t_1</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[5120, 96]</code></td><td><code>bfloat16</code></td><td><code>_param_constant2</code></td><td><code>mm_1</code></td></tr><tr><td>25</td><td><code>qkv_projection</code></td><td><code>mm_1</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 96]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_2</code>, <code>t_1</code></td><td><code>split</code></td></tr><tr><td>26</td><td><code>qkv_projection</code></td><td><code>split</code></td><td><code>call_function</code></td><td><code>aten.split.Tensor</code></td><td><code>-</code></td><td><code>-</code></td><td><code>mm_1</code></td><td><code>getitem_2</code>, <code>getitem_3</code></td></tr><tr><td>27</td><td><code>qkv_projection</code></td><td><code>getitem_2</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 48]</code></td><td><code>bfloat16</code></td><td><code>split</code></td><td><code>gdn_attention_core</code></td></tr><tr><td>28</td><td><code>qkv_projection</code></td><td><code>getitem_3</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 48]</code></td><td><code>bfloat16</code></td><td><code>split</code></td><td><code>gdn_attention_core</code></td></tr><tr><td>29</td><td><code>qkv_projection</code></td><td><code>zeros</code></td><td><code>call_function</code></td><td><code>aten.zeros.default</code></td><td><code>[1, 48, 128]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>gdn_attention_core</code>, <code>view_1</code></td></tr><tr><td>30</td><td><code>gdn_recurrent_core</code></td><td><code>gdn_attention_core</code></td><td><code>call_function</code></td><td><code>vllm.gdn_attention_core.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>getitem</code>, <code>getitem_2</code>, <code>getitem_3</code>, <code>zeros</code></td><td>-</td></tr><tr><td>31</td><td><code>gdn_gated_rmsnorm</code></td><td><code>view_1</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[48, 128]</code></td><td><code>bfloat16</code></td><td><code>zeros</code></td><td><code>_to_copy_3</code></td></tr><tr><td>32</td><td><code>gdn_gated_rmsnorm</code></td><td><code>view_2</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[48, 128]</code></td><td><code>bfloat16</code></td><td><code>view</code></td><td><code>_to_copy_5</code></td></tr><tr><td>33</td><td><code>gdn_gated_rmsnorm</code></td><td><code>_to_copy_3</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>view_1</code></td><td><code>mul_2</code>, <code>pow_2</code></td></tr><tr><td>34</td><td><code>gdn_gated_rmsnorm</code></td><td><code>_param_constant3</code></td><td><code>get_attr</code></td><td><code>_param_constant3</code></td><td><code>[128]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>_to_copy_4</code></td></tr><tr><td>35</td><td><code>gdn_gated_rmsnorm</code></td><td><code>_to_copy_4</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[128]</code></td><td><code>float32</code></td><td><code>_param_constant3</code></td><td><code>mul_3</code></td></tr><tr><td>36</td><td><code>gdn_gated_rmsnorm</code></td><td><code>_to_copy_5</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>view_2</code></td><td><code>silu</code></td></tr><tr><td>37</td><td><code>gdn_gated_rmsnorm</code></td><td><code>pow_2</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>_to_copy_3</code></td><td><code>mean_1</code></td></tr><tr><td>38</td><td><code>gdn_gated_rmsnorm</code></td><td><code>mean_1</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[48, 1]</code></td><td><code>float32</code></td><td><code>pow_2</code></td><td><code>add_2</code></td></tr><tr><td>39</td><td><code>gdn_gated_rmsnorm</code></td><td><code>add_2</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[48, 1]</code></td><td><code>float32</code></td><td><code>mean_1</code></td><td><code>rsqrt_1</code></td></tr><tr><td>40</td><td><code>gdn_gated_rmsnorm</code></td><td><code>rsqrt_1</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[48, 1]</code></td><td><code>float32</code></td><td><code>add_2</code></td><td><code>mul_2</code></td></tr><tr><td>41</td><td><code>gdn_gated_rmsnorm</code></td><td><code>mul_2</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>_to_copy_3</code>, <code>rsqrt_1</code></td><td><code>mul_3</code></td></tr><tr><td>42</td><td><code>gdn_gated_rmsnorm</code></td><td><code>mul_3</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>_to_copy_4</code>, <code>mul_2</code></td><td><code>mul_4</code></td></tr><tr><td>43</td><td><code>gdn_gated_rmsnorm</code></td><td><code>silu</code></td><td><code>call_function</code></td><td><code>aten.silu.default</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>_to_copy_5</code></td><td><code>mul_4</code></td></tr><tr><td>44</td><td><code>gdn_gated_rmsnorm</code></td><td><code>mul_4</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[48, 128]</code></td><td><code>float32</code></td><td><code>mul_3</code>, <code>silu</code></td><td><code>_to_copy_6</code></td></tr><tr><td>45</td><td><code>gdn_gated_rmsnorm</code></td><td><code>_to_copy_6</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[48, 128]</code></td><td><code>bfloat16</code></td><td><code>mul_4</code></td><td><code>view_3</code></td></tr><tr><td>46</td><td><code>gdn_gated_rmsnorm</code></td><td><code>view_3</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 48, 128]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_6</code></td><td><code>view_4</code></td></tr><tr><td>47</td><td><code>gdn_gated_rmsnorm</code></td><td><code>view_4</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>view_3</code></td><td><code>mm_2</code></td></tr><tr><td>48</td><td><code>output_projection</code></td><td><code>_param_constant4</code></td><td><code>get_attr</code></td><td><code>_param_constant4</code></td><td><code>[5120, 6144]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_2</code></td></tr><tr><td>49</td><td><code>output_projection</code></td><td><code>t_2</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[6144, 5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant4</code></td><td><code>mm_2</code></td></tr><tr><td>50</td><td><code>output_projection</code></td><td><code>mm_2</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>view_4</code>, <code>t_2</code></td><td><code>copy_</code></td></tr><tr><td>51</td><td><code>output_projection</code></td><td><code>copy_</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>empty_like</code>, <code>mm_2</code></td><td><code>add_3</code></td></tr><tr><td>52</td><td><code>output_projection</code></td><td><code>_param_constant5</code></td><td><code>get_attr</code></td><td><code>_param_constant5</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach_1</code></td></tr><tr><td>53</td><td><code>output_projection</code></td><td><code>detach_1</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant5</code></td><td><code>_to_copy_8</code></td></tr><tr><td>54</td><td><code>output_projection</code></td><td><code>add_3</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>arg1_1</code>, <code>copy_</code></td><td><code>_to_copy_7</code>, <code>output</code></td></tr><tr><td>55</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_7</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>add_3</code></td><td><code>mul_5</code>, <code>pow_3</code></td></tr><tr><td>56</td><td><code>post_attention_rmsnorm</code></td><td><code>pow_3</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy_7</code></td><td><code>mean_2</code></td></tr><tr><td>57</td><td><code>post_attention_rmsnorm</code></td><td><code>mean_2</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>pow_3</code></td><td><code>add_4</code></td></tr><tr><td>58</td><td><code>post_attention_rmsnorm</code></td><td><code>add_4</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>mean_2</code></td><td><code>rsqrt_2</code></td></tr><tr><td>59</td><td><code>post_attention_rmsnorm</code></td><td><code>rsqrt_2</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>add_4</code></td><td><code>mul_5</code></td></tr><tr><td>60</td><td><code>post_attention_rmsnorm</code></td><td><code>mul_5</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy_7</code>, <code>rsqrt_2</code></td><td><code>mul_6</code></td></tr><tr><td>61</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_8</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>detach_1</code></td><td><code>add_5</code></td></tr><tr><td>62</td><td><code>post_attention_rmsnorm</code></td><td><code>add_5</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>_to_copy_8</code></td><td><code>mul_6</code></td></tr><tr><td>63</td><td><code>post_attention_rmsnorm</code></td><td><code>mul_6</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>mul_5</code>, <code>add_5</code></td><td><code>_to_copy_9</code></td></tr><tr><td>64</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_9</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>mul_6</code></td><td><code>mm_3</code></td></tr><tr><td>65</td><td><code>mlp</code></td><td><code>_param_constant6</code></td><td><code>get_attr</code></td><td><code>_param_constant6</code></td><td><code>[34816, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_3</code></td></tr><tr><td>66</td><td><code>mlp</code></td><td><code>t_3</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[5120, 34816]</code></td><td><code>bfloat16</code></td><td><code>_param_constant6</code></td><td><code>mm_3</code></td></tr><tr><td>67</td><td><code>mlp</code></td><td><code>mm_3</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 34816]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_9</code>, <code>t_3</code></td><td><code>silu_and_mul</code></td></tr><tr><td>68</td><td><code>mlp</code></td><td><code>empty</code></td><td><code>call_function</code></td><td><code>aten.empty.memory_format</code></td><td><code>[1, 17408]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>mm_4</code>, <code>silu_and_mul</code></td></tr><tr><td>69</td><td><code>mlp</code></td><td><code>silu_and_mul</code></td><td><code>call_function</code></td><td><code>_C.silu_and_mul.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>mm_3</code>, <code>empty</code></td><td>-</td></tr><tr><td>70</td><td><code>mlp</code></td><td><code>_param_constant7</code></td><td><code>get_attr</code></td><td><code>_param_constant7</code></td><td><code>[5120, 17408]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_4</code></td></tr><tr><td>71</td><td><code>mlp</code></td><td><code>t_4</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[17408, 5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant7</code></td><td><code>mm_4</code></td></tr><tr><td>72</td><td><code>mlp</code></td><td><code>mm_4</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>empty</code>, <code>t_4</code></td><td><code>output</code></td></tr><tr><td>73</td><td><code>layer_output</code></td><td><code>output</code></td><td><code>output</code></td><td><code>output</code></td><td><code>-</code></td><td><code>-</code></td><td><code>add_3</code>, <code>mm_4</code></td><td>-</td></tr></tbody></table></article><article id="vis"><h1>B. 手工解释与张量可视化（fx_process_visualization.md）</h1><h1 id="input7_layer0-FX-Process-">input7_layer0 FX Process 手工解释与张量可视化</h1>
+<p>本文件对应 <code>selected:06</code> 的 linear-attention decode 固定输入路径：第 7 次 forward、第 0 层，<code>q/past/kv=1/20585/20586</code>。以下 9 个 process 覆盖全部 74 个 FX nodes。</p>
+<h3 id="Runtime-FX-inputs">Runtime FX inputs</h3>
+<p>节点范围为 #0–#2。</p>
+<p><strong>是什么</strong>：positions <code>[3,1]</code>、单 token hidden <code>[1,5120]</code> 与本次为 <code>None</code> 的 residual。</p>
+<p><strong>为什么需要</strong>：decode 每次只推进一个 token；首层尚未形成 residual，positions 保留在调用签名中但此 linear fixed path 不读取它。</p>
+<p><strong>怎么做/计算</strong>：#0/#1/#2 都是 placeholders。#1 被 RMSNorm 和后续 residual add 使用；#0/#2 users 为空。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_in [1,5120]                                  Formula: H_in=sampled_decode_hidden
+single decode row                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h[0,0] ... h[0,5119]                     │  ◀── only current token
+                                                       └──────────────────────────────────────────┘
+
+Position channel axis 0..2                             Token axis 0..0
+                                                       ▲                   ▲
+Tensor: P [3,1]                                        Formula: P=sampled_positions; users(P)=empty
+position placeholder                            ──▶    ┌──────────────────────────────────────────┐
+                                                       │ p[0,0], p[1,0], p[2,0]                   │  ◀── not consumed in this graph
+                                                       └──────────────────────────────────────────┘
+
+Tensor: R_in                                           Formula: R_in=None
+residual placeholder                           ──▶    [NONE_RESIDUAL]                              ◀── no entry residual tensor</code></pre>
+<h3 id="Input-RMSNorm">Input RMSNorm</h3>
+<p>节点范围为 #3–#15。</p>
+<p><strong>是什么</strong>：单 token hidden 上的 Gemma-style RMSNorm与 <code>[1,5120]</code> output buffer allocation。</p>
+<p><strong>为什么需要</strong>：decode GDN projections 仍需要 normalized hidden；buffer 供 output projection 写入。</p>
+<p><strong>怎么做/计算</strong>：#3/#4 读取并 detach <code>[5120]</code> weight；#5 fp32 cast，#6 square，#7 Hidden mean→<code>[1,1]</code>，#8 加 <code>1e-6</code>，#9 rsqrt，#10 normalize；#11 weight fp32，#12 weight+1，#13 scale，#14 bf16→<code>[1,5120]</code>。#15 <code>empty_like</code> 只分配同形 buffer。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: X32 [1,5120]                                   Formula: X32=fp32(H_in)
+single RMS row                                  ──▶    ┌──────────────────────────────────────────┐
+                                                       │ x[0,0]^2 ... x[0,5119]^2                 │  ◀── reduction source
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Reduced Hidden axis 0..0
+                                                       ▲                     ▲
+Tensor: InvRMS0 [1,1]                                  Formula: 1/sqrt(mean_h(X32^2)+1e-6)
+single scale                                    ──▶    ┌──────────────────────────────────────────┐
+                                                       │ inv0[0]                                  │  ◀── broadcast to 5120 dims
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_norm [1,5120]                                Formula: bf16(X32*InvRMS0*(1+W0))
+normalized decode row                           ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_norm[0,0] ... h_norm[0,5119]           │  ◀── projection input
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Attention-GDN-input-projections-and-head-reshape">Attention/GDN input projections and head reshape</h3>
+<p>节点范围为 #16–#29。</p>
+<p><strong>是什么</strong>：单-token QKVZ/BA projections、Z head view 和 zero core buffer。</p>
+<p><strong>为什么需要</strong>：decode GDN core 需要 mixed-QKV <code>[1,10240]</code>、48 B/A scalars与 <code>[1,48,128]</code> 可写 output；Z 同形用于 gating。</p>
+<p><strong>怎么做/计算</strong>：#16/#17 准备 <code>[16384,5120]</code> weight，#18 得 <code>[1,16384]</code>；#19–#22 split <code>[10240|6144]</code>并把 Z view <code>[1,48,128]</code>。#23/#24 准备 <code>[96,5120]</code> weight，#25 得 <code>[1,96]</code>；#26–#28 等分为 B/A <code>[1,48]</code>。与 prefill graph 不同，这里没有 clone，#30 直接读取这两个 views。#29 zeros分配 <code>[1,48,128]</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Projected-channel axis
+                                                       0             10239 10240             16383
+                                                       ▲                ▲ ▲                     ▲
+Tensor: P_qkvz [1,16384]                               Formula: P_qkvz=H_norm@W_qkvz^T
+QKV/Z split                                     ──▶    ┌──────────────────────────┬───────────────┐
+                                                       │ MIXED_QKV [1,10240]      │ Z [1,6144]    │  ◀── current token
+                                                       └──────────────────────────┴───────────────┘
+
+Token axis 0..0                                        BA-channel axis
+                                                       0                    47 48                 95
+                                                       ▲                     ▲ ▲                   ▲
+Tensor: P_ba [1,96]                                    Formula: P_ba=H_norm@W_ba^T=[B|A]
+direct BA views                                 ──▶    ┌──────────────────────┬────────────────────┐
+                                                       │ B [1,48]             │ A [1,48]           │  ◀── no clone in this graph
+                                                       └──────────────────────┴────────────────────┘
+
+Head axis 0..47                                        Value-head dimension
+                                                       0                                      127
+                                                       ▲                                         ▲
+Tensor: Z_heads [1,48,128]                             Formula: Z_heads=reshape(Z)
+Tensor: Core_buf [1,48,128]                            Formula: Core_buf=zeros_like(Z_heads)
+head-aligned rows                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ z/core[0,head,0] ... [0,head,127]        │  ◀── head=0..47
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Gated-DeltaNet-recurrent-core">Gated DeltaNet recurrent core</h3>
+<p>节点范围为 #30。</p>
+<p><strong>是什么</strong>：decode 的 opaque <code>gdn_attention_core</code> mutation boundary。</p>
+<p><strong>为什么需要</strong>：它把当前 token与进入 decode 的 GDN recurrent state结合，并写 48-head output。</p>
+<p><strong>怎么做/计算</strong>：#30 接收 mixed-QKV <code>[1,10240]</code>、未经 clone 的 B/A <code>[1,48]</code>、zero buffer <code>[1,48,128]</code> 和 layer-0 prefix。后续读取被写入的 buffer。外部 snapshots 是 <code>[1,3,10240]</code> 与 <code>[1,48,128,128]</code>；FX 不暴露内部 state update 或 kernel。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Mixed-channel axis
+                                                       0                                     10239
+                                                       ▲                                         ▲
+Tensor: Mixed [1,10240]                                Formula: Mixed=QKV_partition(P_qkvz)
+decode projected row                            ──▶    ┌──────────────────────────────────────────┐
+                                                       │ mixed[0,0] ... mixed[0,10239]            │  ◀── opaque input
+                                                       └──────────────────────────────────────────┘
+
+State-0 lane axis 0..2                                 State-0 channel axis
+                                                       0                                     10239
+                                                       ▲                                         ▲
+Tensor: State0_entry [1,3,10240]                       Formula: State0_entry=sampled_external_GDN_state_tensor_0
+external state tensor 0                         ──▶    ┌──────────────────────────────────────────┐
+                                                       │ STATE0_LANES_0_TO_2 x CHANNELS_0_TO_10239│ ◀── observed entry slice
+                                                       └──────────────────────────────────────────┘
+
+Value-head axis 0..47                                  State dimension 0..127
+                                                       0                                      127
+                                                       ▲                                         ▲
+Tensor: S_entry [1,48,128,128]                         Formula: S_entry=sampled_external_GDN_state
+entry recurrent state                           ──▶    ┌──────────────────────────────────────────┐
+                                                       │ STATE_HEADS_0_TO_47                      │  ◀── mutation internals opaque
+                                                       └──────────────────────────────────────────┘
+
+Head axis 0..47                                        Value-head dimension 0..127
+                                                       0                                      127
+                                                       ▲                                         ▲
+Tensor: Core_out [1,48,128]                            Formula: Core_out=OpaqueGDN(Mixed,B,A,S_entry)
+mutated decode output                           ──▶    ┌──────────────────────────────────────────┐
+                                                       │ core[0,head,0] ... core[0,head,127]      │  ◀── boundary output only
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Gated-DeltaNet-output-RMSNorm-and-SiLU-gate">Gated DeltaNet output RMSNorm and SiLU gate</h3>
+<p>节点范围为 #31–#47。</p>
+<p><strong>是什么</strong>：48 core rows 的 per-head RMSNorm、Z SiLU gate 和 head merge。</p>
+<p><strong>为什么需要</strong>：单 token 的 48 heads 仍要独立规范化 128 dims，并由相同 head/dim坐标的 Z gate调节。</p>
+<p><strong>怎么做/计算</strong>：#31/#32 将 core/Z view为 <code>[48,128]</code>。#33 core fp32；#34/#35 weight读取/cast；#36 Z fp32。#37 square，#38 mean over 128→<code>[48,1]</code>，#39 epsilon，#40 rsqrt，#41 normalize，#42 weight scale；#43 SiLU(Z)，#44逐元素乘，#45 bf16，#46恢复 <code>[1,48,128]</code>，#47 merge <code>[1,6144]</code>。</p>
+<pre class="diagram"><code>Flattened head-row axis 0..47                          Head dimension
+                                                       0                                      127
+                                                       ▲                                         ▲
+Tensor: C32 [48,128]                                   Formula: C32=fp32(reshape(Core_out))
+Tensor: Z32 [48,128]                                   Formula: Z32=fp32(reshape(Z_heads))
+aligned head rows                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ c[head,0..127] / z[head,0..127]          │  ◀── one row per head
+                                                       └──────────────────────────────────────────┘
+
+Head-row axis 0..47                                    Reduced dimension 0..0
+                                                       ▲                     ▲
+Tensor: InvRMS_c [48,1]                                Formula: 1/sqrt(mean_d(C32^2)+1e-6)
+head scales                                     ──▶    ┌──────────────────────────────────────────┐
+                                                       │ inv_c[0] ... inv_c[47]                   │  ◀── broadcast over 128 dims
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Merged value channels
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: GDN_mix [1,6144]                               Formula: merge_heads(bf16(C32*InvRMS_c*W*SiLU(Z32)))
+gated decode mixer                              ──▶    ┌──────────────────────────────────────────┐
+                                                       │ mix[0,0] ... mix[0,6143]                 │  ◀── 48*128 channels
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Mixer-output-projection-and-residual">Mixer output projection and residual</h3>
+<p>节点范围为 #48–#54。</p>
+<p><strong>是什么</strong>：6144→5120 projection、buffer copy 与首层 hidden residual建立。</p>
+<p><strong>为什么需要</strong>：GDN channels 要回到 model width；因为 entry residual=None，base residual 是 <code>H_in</code> 本身。</p>
+<p><strong>怎么做/计算</strong>：#48/#49 准备 <code>[5120,6144]</code> weight；#50 得 <code>[1,5120]</code>，#51 copy进 buffer。#52/#53 读取并 detach下一 norm weight；#54 得 <code>R_attn=projected+arg1_1</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Mixer-channel axis
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: GDN_mix [1,6144]                               Formula: source=normalized_gated_GDN_heads
+projection source                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ mix[0,0] ... mix[0,6143]                 │  ◀── single mixer row
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: P_out [1,5120]                                 Formula: P_out=GDN_mix@W_out^T
+Tensor: R_attn [1,5120]                                Formula: R_attn=P_out+H_in
+project-and-add                                 ──▶    ┌──────────────────────────────────────────┐
+                                                       │ p[0,h]+h[0,h]=r_attn[0,h]                │  ◀── h=0..5119
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Post-attention-RMSNorm">Post-attention RMSNorm</h3>
+<p>节点范围为 #55–#64。</p>
+<p><strong>是什么</strong>：单 residual row 上的第二个 RMSNorm。</p>
+<p><strong>为什么需要</strong>：MLP 需要 normalized <code>[1,5120]</code> input，同时 <code>R_attn</code> 作为 residual保留。</p>
+<p><strong>怎么做/计算</strong>：#55 fp32，#56 square，#57 Hidden mean→<code>[1,1]</code>，#58 epsilon，#59 rsqrt，#60 normalize；#61 weight cast，#62 weight+1，#63 scale，#64 bf16。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: R32 [1,5120]                                   Formula: R32=fp32(R_attn)
+RMS source                                      ──▶    ┌──────────────────────────────────────────┐
+                                                       │ r32[0,0]^2 ... r32[0,5119]^2             │  ◀── Hidden reduction
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Reduced Hidden axis 0..0
+                                                       ▲                     ▲
+Tensor: InvRMS1 [1,1]                                  Formula: 1/sqrt(mean_h(R32^2)+1e-6)
+single post scale                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ inv1[0]                                  │  ◀── broadcast over Hidden
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_mlp [1,5120]                                 Formula: bf16(R32*InvRMS1*(1+W1))
+MLP decode row                                  ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_mlp[0,0] ... h_mlp[0,5119]             │  ◀── normalized input
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Gated-MLP-projections">Gated MLP projections</h3>
+<p>节点范围为 #65–#72。</p>
+<p><strong>是什么</strong>：single-token dense gated MLP。</p>
+<p><strong>为什么需要</strong>：对当前 decode row做 channel expansion和非线性后返回 5120 hidden。</p>
+<p><strong>怎么做/计算</strong>：#65/#66 准备 <code>[34816,5120]</code> weight；#67 得 <code>[1,34816]=[gate|up]</code>。#68 分配 <code>[1,17408]</code>，#69 fused boundary写 <code>SiLU(gate)*up</code>。#70/#71 准备 down weight，#72 得 <code>[1,5120]</code>；fused internals未展开。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Expanded-channel axis
+                                                       0                  17407 17408          34815
+                                                       ▲                      ▲ ▲                  ▲
+Tensor: GU [1,34816]                                   Formula: GU=H_mlp@W_gate_up^T=[GATE|UP]
+expanded decode row                             ──▶    ┌───────────────────────┬────────────────────┐
+                                                       │ GATE [1,17408]        │ UP [1,17408]       │  ◀── paired features
+                                                       └───────────────────────┴────────────────────┘
+
+Token axis 0..0                                        Intermediate axis
+                                                       0                                     17407
+                                                       ▲                                         ▲
+Tensor: M [1,17408]                                    Formula: M=SiLU(GATE)*UP
+nonlinear product                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ m[0,j]=silu(g[0,j])*u[0,j]               │  ◀── j=0..17407
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_out [1,5120]                                 Formula: H_out=M@W_down^T
+decode hidden output                            ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_out[0,0] ... h_out[0,5119]             │  ◀── restored width
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Layer-output">Layer output</h3>
+<p>节点范围为 #73。</p>
+<p><strong>是什么</strong>：单-token hidden/residual tuple。</p>
+<p><strong>为什么需要</strong>：下一层分别消费 MLP output 和 residual stream。</p>
+<p><strong>怎么做/计算</strong>：#73 返回 <code>(mm_4,add_3)</code>，两者均 <code>[1,5120]</code>，不新增 arithmetic。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis 0..5119
+                                                       ▲                     ▲
+Tensor: H_out [1,5120]                                 Formula: H_out=MLP_down(H_mlp)
+hidden return                                   ──▶    [H_OUT_ROW]                                ◀── tuple item 0
+
+Tensor: R_attn [1,5120]                                Formula: R_attn=ProjectedGDN+H_in
+residual return                                 ──▶    [RESIDUAL_ROW]                              ◀── tuple item 1
+
+Tensor: LayerTuple                                     Formula: LayerTuple=(H_out,R_attn)
+packaged output                                 ──▶    [(1,5120),(1,5120)]                        ◀── no new arithmetic</code></pre></article></body></html>

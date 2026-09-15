@@ -1,0 +1,441 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>input7_layer3 · 负载分析</title><style>
+body{font-family:system-ui,-apple-system,"Noto Sans CJK SC","PingFang SC",sans-serif;max-width:1100px;margin:40px auto;padding:0 24px;color:#182536;background:#f5f7fa;line-height:1.65}
+section,article{background:#fff;border:1px solid #dce2e8;border-radius:12px;padding:24px 28px;margin:20px 0}
+h1{font-size:1.6em}h2{font-size:1.3em;border-bottom:1px solid #e3e8ee;padding-bottom:6px;margin-top:1.6em}h3{font-size:1.1em;margin-top:1.4em}
+a{color:#1765ad;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:#eef2f6;padding:1px 5px;border-radius:4px}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.45}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre.diagram{background:#fbfcfd;color:#182536;border:1px solid #dce2e8}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.93em}th,td{border:1px solid #dce2e8;padding:6px 10px;text-align:left;vertical-align:top}th{background:#eef2f6}
+nav.top{font-size:.9em;margin-bottom:12px}nav.top a{margin-right:14px}
+.muted{color:#5b6b7c;font-size:.9em}.tag{display:inline-block;background:#eef2f6;border-radius:999px;padding:1px 10px;font-size:.8em;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{border:1px solid #dce2e8;border-radius:10px;padding:14px 16px;background:#fbfcfd}.card h3{margin:0 0 6px;font-size:1.02em}
+.toc{columns:2;column-gap:32px;font-size:.92em}.toc li{break-inside:avoid}
+</style></head><body><nav class="top"><a href="../index.html">← 负载分析索引</a><a href="input7_layer0.html">‹ input7_layer0</a><a href="input29_layer62.html">input29_layer62 ›</a><a href="#recon">生成式重建</a><a href="#vis">手工可视化</a></nav><h1>input7_layer3 <span class="tag">selected:07</span></h1><p class="muted">full_attention · decode · q/past/kv = 1/20585/20586 · 155 FX nodes / 10 processes</p><p class="muted">原始文件：<a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_process_reconstruction.md">fx_process_reconstruction.md</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_process_visualization.md">fx_process_visualization.md</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_process_reconstruction.json">fx_process_reconstruction.json</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_process_nodes.csv">fx_process_nodes.csv</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_graph.py">fx_graph.py</a> · <a href="../../../auto_trace/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3/fx_nodes.json">fx_nodes.json</a></p><article id="recon"><h1>A. 生成式 Process 重建（fx_process_reconstruction.md）</h1><h1 id="FX-Layer-Process-Reconstruction">FX Layer Process Reconstruction</h1>
+<p>Event: <code>input7_layer3</code> (<code>selected:07</code>) Source event: <code>chatcmpl-bench-7f1746b7-0-9eeec82b|s7|f7|l3|o0</code> Observed path: <code>full_attention</code>, phase <code>decode</code>, q/past/kv = <code>1/20585/20586</code> Trace directory: <code>/public/home/tangyu408/Qwen_DCU_Worker_0/workload_profile/fx/traces/20260729T050800Z-fx-89687ae2-R032-qwen35-27b-eager-row0-hcu0/input7_layer3</code> GraphModule provenance: <code>fx_graph_module.pt</code> (SHA-256 <code>959965bcf907d6dc011886afaf2d33ba36658bf337cc25b92cd8f57a4c0b1365</code>) Capture-time nodes: <code>fx_nodes.json</code> (SHA-256 <code>2b6df7cfb808a18c70f6201912f5e3171cc1cce7df446752ff112a393d7dab0f</code>)</p>
+<p>Source: rule reconstruction over the capture-time serialization of <code>GraphModule.graph.nodes</code>; the meta-storage GraphModule is not executed. Process labels are target-specific reconstruction labels, not FX metadata or proof of runtime module ownership. Opaque vLLM/ROCm/DCU custom-op nodes expose only their observed call and mutation boundary; their internal kernels are not reconstructed.</p>
+<h2 id="Stage-Summary">Stage Summary</h2>
+<table><thead><tr><th>stage</th><th>rule</th><th>node range</th><th>count</th><th>external inputs</th><th>external outputs</th></tr></thead><tbody><tr><td>Runtime FX inputs</td><td>contiguous placeholder prefix</td><td>0-2</td><td>3</td><td>-</td><td><code>arg0_1</code>, <code>arg1_1</code>, <code>arg2_1</code></td></tr><tr><td>Input RMSNorm</td><td>nodes after placeholders through the node before the first mixer projection weight</td><td>3-16</td><td>14</td><td><code>arg1_1</code>, <code>arg2_1</code></td><td><code>add</code>, <code>_to_copy_2</code>, <code>empty_like</code></td></tr><tr><td>Attention/GDN input projections and head reshape</td><td>first mixer projection weight through the node before the family landmark (RoPE table or GDN custom op)</td><td>17-59</td><td>43</td><td><code>_to_copy_2</code></td><td><code>getitem_2</code>, <code>_unsafe_view_1</code>, <code>view_2</code>, <code>view_4</code></td></tr><tr><td>RoPE position embedding</td><td>position-indexed rotary table lookup and observed Q/K rotary arithmetic through the node before attention output allocation</td><td>60-118</td><td>59</td><td><code>arg0_1</code>, <code>view_2</code>, <code>view_4</code></td><td><code>view_6</code>, <code>view_8</code></td></tr><tr><td>KV-cache update and unified full attention</td><td>attention output allocation/views, opaque KV-cache update, and opaque unified attention call</td><td>119-125</td><td>7</td><td><code>getitem_2</code>, <code>view_6</code>, <code>view_8</code></td><td><code>view_10</code></td></tr><tr><td>Attention output gate and hidden reshape</td><td>opaque attention output view followed by observed sigmoid output gate multiplication</td><td>126-128</td><td>3</td><td><code>_unsafe_view_1</code>, <code>view_10</code></td><td><code>mul_14</code></td></tr><tr><td>Mixer output projection and residual</td><td>mixer output projection weight through output-buffer copy and observed residual add</td><td>129-135</td><td>7</td><td><code>add</code>, <code>empty_like</code>, <code>mul_14</code></td><td><code>detach_3</code>, <code>add_9</code></td></tr><tr><td>Post-attention RMSNorm</td><td>nodes after mixer residual add through the normalized MLP input</td><td>136-145</td><td>10</td><td><code>detach_3</code>, <code>add_9</code></td><td><code>_to_copy_11</code></td></tr><tr><td>Gated MLP projections</td><td>gate/up projection weight, fused SiLU-product boundary, and down projection through the node before graph output</td><td>146-153</td><td>8</td><td><code>_to_copy_11</code></td><td><code>mm_3</code></td></tr><tr><td>Layer output</td><td>single FX output node</td><td>154-154</td><td>1</td><td><code>add_9</code>, <code>mm_3</code></td><td>-</td></tr></tbody></table>
+<h2 id="Process-Code">Process Code</h2>
+<h3 id="Runtime-FX-inputs">Runtime FX inputs</h3>
+<pre><code># placeholder arg0_1
+# placeholder arg1_1
+# placeholder arg2_1</code></pre>
+<h3 id="Input-RMSNorm">Input RMSNorm</h3>
+<pre><code>_param_constant0 = self._param_constant0
+detach = aten.detach.default(_param_constant0,)
+add = aten.add.Tensor(arg1_1, arg2_1)
+_to_copy = aten._to_copy.default(add,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_1 = aten.pow.Tensor_Scalar(_to_copy, 2)
+mean = aten.mean.dim(pow_1, [-1], True)
+add_1 = aten.add.Tensor(mean, 1e-06)
+rsqrt = aten.rsqrt.default(add_1,)
+mul = aten.mul.Tensor(_to_copy, rsqrt)
+_to_copy_1 = aten._to_copy.default(detach,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_2 = aten.add.Tensor(_to_copy_1, 1.0)
+mul_1 = aten.mul.Tensor(mul, add_2)
+_to_copy_2 = aten._to_copy.default(mul_1,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}
+empty_like = aten.empty_like.default(_to_copy_2,)  # kwargs={&#x27;pin_memory&#x27;: False}</code></pre>
+<h3 id="Attention-GDN-input-projections-and-head-reshape">Attention/GDN input projections and head reshape</h3>
+<pre><code>_param_constant1 = self._param_constant1
+t = aten.t.default(_param_constant1,)
+mm = aten.mm.default(_to_copy_2, t)
+split_with_sizes = aten.split_with_sizes.default(mm, [12288, 1024, 1024], -1)
+getitem = &lt;built-in function getitem&gt;(split_with_sizes, 0)
+getitem_1 = &lt;built-in function getitem&gt;(split_with_sizes, 1)
+getitem_2 = &lt;built-in function getitem&gt;(split_with_sizes, 2)
+view = aten.view.default(getitem, [1, 24, -1])
+split = aten.split.Tensor(view, 256, -1)
+getitem_3 = &lt;built-in function getitem&gt;(split, 0)
+getitem_4 = &lt;built-in function getitem&gt;(split, 1)
+clone = aten.clone.default(getitem_3,)  # kwargs={&#x27;memory_format&#x27;: torch.contiguous_format}
+_unsafe_view = aten._unsafe_view.default(clone, [1, 6144])
+clone_1 = aten.clone.default(getitem_4,)  # kwargs={&#x27;memory_format&#x27;: torch.contiguous_format}
+_unsafe_view_1 = aten._unsafe_view.default(clone_1, [1, 6144])
+view_1 = aten.view.default(_unsafe_view, [-1, 24, 256])
+_param_constant2 = self._param_constant2
+detach_1 = aten.detach.default(_param_constant2,)
+_to_copy_3 = aten._to_copy.default(view_1,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_2 = aten.pow.Tensor_Scalar(_to_copy_3, 2)
+mean_1 = aten.mean.dim(pow_2, [-1], True)
+add_3 = aten.add.Tensor(mean_1, 1e-06)
+rsqrt_1 = aten.rsqrt.default(add_3,)
+mul_2 = aten.mul.Tensor(_to_copy_3, rsqrt_1)
+_to_copy_4 = aten._to_copy.default(detach_1,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_4 = aten.add.Tensor(_to_copy_4, 1.0)
+mul_3 = aten.mul.Tensor(mul_2, add_4)
+_to_copy_5 = aten._to_copy.default(mul_3,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}
+view_2 = aten.view.default(_to_copy_5, [-1, 6144])
+view_3 = aten.view.default(getitem_1, [-1, 4, 256])
+_param_constant3 = self._param_constant3
+detach_2 = aten.detach.default(_param_constant3,)
+_to_copy_6 = aten._to_copy.default(view_3,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_3 = aten.pow.Tensor_Scalar(_to_copy_6, 2)
+mean_2 = aten.mean.dim(pow_3, [-1], True)
+add_5 = aten.add.Tensor(mean_2, 1e-06)
+rsqrt_2 = aten.rsqrt.default(add_5,)
+mul_4 = aten.mul.Tensor(_to_copy_6, rsqrt_2)
+_to_copy_7 = aten._to_copy.default(detach_2,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_6 = aten.add.Tensor(_to_copy_7, 1.0)
+mul_5 = aten.mul.Tensor(mul_4, add_6)
+_to_copy_8 = aten._to_copy.default(mul_5,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}
+view_4 = aten.view.default(_to_copy_8, [-1, 1024])</code></pre>
+<h3 id="RoPE-position-embedding">RoPE position embedding</h3>
+<pre><code>_tensor_constant0 = self._tensor_constant0
+index = aten.index.Tensor(_tensor_constant0, [arg0_1])
+split_1 = aten.split.Tensor(index, 32, -1)
+getitem_5 = &lt;built-in function getitem&gt;(split_1, 0)
+getitem_6 = &lt;built-in function getitem&gt;(split_1, 1)
+select = aten.select.int(getitem_5, 0, 0)
+clone_2 = aten.clone.default(select,)
+select_1 = aten.select.int(getitem_5, 0, 1)
+slice_1 = aten.slice.Tensor(select_1, 1, 1, 33, 3)
+slice_2 = aten.slice.Tensor(clone_2, 1, 1, 33, 3)
+copy_ = aten.copy_.default(slice_2, slice_1)
+select_2 = aten.select.int(getitem_5, 0, 2)
+slice_3 = aten.slice.Tensor(select_2, 1, 2, 30, 3)
+slice_4 = aten.slice.Tensor(clone_2, 1, 2, 30, 3)
+copy__1 = aten.copy_.default(slice_4, slice_3)
+select_3 = aten.select.int(getitem_6, 0, 0)
+clone_3 = aten.clone.default(select_3,)
+select_4 = aten.select.int(getitem_6, 0, 1)
+slice_5 = aten.slice.Tensor(select_4, 1, 1, 33, 3)
+slice_6 = aten.slice.Tensor(clone_3, 1, 1, 33, 3)
+copy__2 = aten.copy_.default(slice_6, slice_5)
+select_5 = aten.select.int(getitem_6, 0, 2)
+slice_7 = aten.slice.Tensor(select_5, 1, 2, 30, 3)
+slice_8 = aten.slice.Tensor(clone_3, 1, 2, 30, 3)
+copy__3 = aten.copy_.default(slice_8, slice_7)
+view_5 = aten.view.default(view_2, [1, -1, 256])
+slice_9 = aten.slice.Tensor(view_5, 2, 0, 64)
+slice_10 = aten.slice.Tensor(view_5, 2, 64, 9223372036854775807)
+unsqueeze = aten.unsqueeze.default(clone_2, -2)
+unsqueeze_1 = aten.unsqueeze.default(clone_3, -2)
+split_2 = aten.split.Tensor(slice_9, 32, -1)
+getitem_7 = &lt;built-in function getitem&gt;(split_2, 0)
+getitem_8 = &lt;built-in function getitem&gt;(split_2, 1)
+mul_6 = aten.mul.Tensor(getitem_7, unsqueeze)
+mul_7 = aten.mul.Tensor(getitem_8, unsqueeze_1)
+sub = aten.sub.Tensor(mul_6, mul_7)
+mul_8 = aten.mul.Tensor(getitem_8, unsqueeze)
+mul_9 = aten.mul.Tensor(getitem_7, unsqueeze_1)
+add_7 = aten.add.Tensor(mul_8, mul_9)
+cat = aten.cat.default([sub, add_7], -1)
+cat_1 = aten.cat.default([cat, slice_10], -1)
+view_6 = aten.view.default(cat_1, [1, 6144])
+view_7 = aten.view.default(view_4, [1, -1, 256])
+slice_11 = aten.slice.Tensor(view_7, 2, 0, 64)
+slice_12 = aten.slice.Tensor(view_7, 2, 64, 9223372036854775807)
+unsqueeze_2 = aten.unsqueeze.default(clone_2, -2)
+unsqueeze_3 = aten.unsqueeze.default(clone_3, -2)
+split_3 = aten.split.Tensor(slice_11, 32, -1)
+getitem_9 = &lt;built-in function getitem&gt;(split_3, 0)
+getitem_10 = &lt;built-in function getitem&gt;(split_3, 1)
+mul_10 = aten.mul.Tensor(getitem_9, unsqueeze_2)
+mul_11 = aten.mul.Tensor(getitem_10, unsqueeze_3)
+sub_1 = aten.sub.Tensor(mul_10, mul_11)
+mul_12 = aten.mul.Tensor(getitem_10, unsqueeze_2)
+mul_13 = aten.mul.Tensor(getitem_9, unsqueeze_3)
+add_8 = aten.add.Tensor(mul_12, mul_13)
+cat_2 = aten.cat.default([sub_1, add_8], -1)
+cat_3 = aten.cat.default([cat_2, slice_12], -1)
+view_8 = aten.view.default(cat_3, [1, 1024])</code></pre>
+<h3 id="KV-cache-update-and-unified-full-attention">KV-cache update and unified full attention</h3>
+<pre><code>empty = aten.empty.memory_format([1, 6144],)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16, &#x27;device&#x27;: device(type=&#x27;cuda&#x27;, index=0), &#x27;pin_memory&#x27;: False}
+view_9 = aten.view.default(view_6, [-1, 24, 256])
+view_10 = aten.view.default(empty, [-1, 24, 256])
+view_11 = aten.view.default(view_8, [-1, 4, 256])
+view_12 = aten.view.default(getitem_2, [-1, 4, 256])
+unified_kv_cache_update = vllm.unified_kv_cache_update.default(view_11, view_12, &#x27;language_model.model.layers.3.self_attn.attn&#x27;)
+unified_attention_with_output = vllm.unified_attention_with_output.default(view_9, view_11, view_12, view_10, &#x27;language_model.model.layers.3.self_attn.attn&#x27;, None, None, unified_kv_cache_update)</code></pre>
+<h3 id="Attention-output-gate-and-hidden-reshape">Attention output gate and hidden reshape</h3>
+<pre><code>view_13 = aten.view.default(view_10, [-1, 6144])
+sigmoid = aten.sigmoid.default(_unsafe_view_1,)
+mul_14 = aten.mul.Tensor(view_13, sigmoid)</code></pre>
+<h3 id="Mixer-output-projection-and-residual">Mixer output projection and residual</h3>
+<pre><code>_param_constant4 = self._param_constant4
+t_1 = aten.t.default(_param_constant4,)
+mm_1 = aten.mm.default(mul_14, t_1)
+copy__4 = aten.copy_.default(empty_like, mm_1)
+_param_constant5 = self._param_constant5
+detach_3 = aten.detach.default(_param_constant5,)
+add_9 = aten.add.Tensor(copy__4, add)</code></pre>
+<h3 id="Post-attention-RMSNorm">Post-attention RMSNorm</h3>
+<pre><code>_to_copy_9 = aten._to_copy.default(add_9,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+pow_4 = aten.pow.Tensor_Scalar(_to_copy_9, 2)
+mean_3 = aten.mean.dim(pow_4, [-1], True)
+add_10 = aten.add.Tensor(mean_3, 1e-06)
+rsqrt_3 = aten.rsqrt.default(add_10,)
+mul_15 = aten.mul.Tensor(_to_copy_9, rsqrt_3)
+_to_copy_10 = aten._to_copy.default(detach_3,)  # kwargs={&#x27;dtype&#x27;: torch.float32}
+add_11 = aten.add.Tensor(_to_copy_10, 1.0)
+mul_16 = aten.mul.Tensor(mul_15, add_11)
+_to_copy_11 = aten._to_copy.default(mul_16,)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16}</code></pre>
+<h3 id="Gated-MLP-projections">Gated MLP projections</h3>
+<pre><code>_param_constant6 = self._param_constant6
+t_2 = aten.t.default(_param_constant6,)
+mm_2 = aten.mm.default(_to_copy_11, t_2)
+empty_1 = aten.empty.memory_format([1, 17408],)  # kwargs={&#x27;dtype&#x27;: torch.bfloat16, &#x27;device&#x27;: device(type=&#x27;cuda&#x27;, index=0), &#x27;pin_memory&#x27;: False}
+silu_and_mul = _C.silu_and_mul.default(empty_1, mm_2)
+_param_constant7 = self._param_constant7
+t_3 = aten.t.default(_param_constant7,)
+mm_3 = aten.mm.default(empty_1, t_3)</code></pre>
+<h3 id="Layer-output">Layer output</h3>
+<pre><code>return ((mm_3, add_9),)</code></pre>
+<h2 id="Node-Table">Node Table</h2>
+<table><thead><tr><th>index</th><th>stage</th><th>name</th><th>op</th><th>target</th><th>shape</th><th>dtype</th><th>args</th><th>users</th></tr></thead><tbody><tr><td>0</td><td><code>inputs</code></td><td><code>arg0_1</code></td><td><code>placeholder</code></td><td><code>arg0_1</code></td><td><code>[3, 1]</code></td><td><code>int64</code></td><td>-</td><td><code>index</code></td></tr><tr><td>1</td><td><code>inputs</code></td><td><code>arg1_1</code></td><td><code>placeholder</code></td><td><code>arg1_1</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>add</code></td></tr><tr><td>2</td><td><code>inputs</code></td><td><code>arg2_1</code></td><td><code>placeholder</code></td><td><code>arg2_1</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>add</code></td></tr><tr><td>3</td><td><code>input_rmsnorm</code></td><td><code>_param_constant0</code></td><td><code>get_attr</code></td><td><code>_param_constant0</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach</code></td></tr><tr><td>4</td><td><code>input_rmsnorm</code></td><td><code>detach</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant0</code></td><td><code>_to_copy_1</code></td></tr><tr><td>5</td><td><code>input_rmsnorm</code></td><td><code>add</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>arg1_1</code>, <code>arg2_1</code></td><td><code>_to_copy</code>, <code>add_9</code></td></tr><tr><td>6</td><td><code>input_rmsnorm</code></td><td><code>_to_copy</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>add</code></td><td><code>mul</code>, <code>pow_1</code></td></tr><tr><td>7</td><td><code>input_rmsnorm</code></td><td><code>pow_1</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy</code></td><td><code>mean</code></td></tr><tr><td>8</td><td><code>input_rmsnorm</code></td><td><code>mean</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>pow_1</code></td><td><code>add_1</code></td></tr><tr><td>9</td><td><code>input_rmsnorm</code></td><td><code>add_1</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>mean</code></td><td><code>rsqrt</code></td></tr><tr><td>10</td><td><code>input_rmsnorm</code></td><td><code>rsqrt</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>add_1</code></td><td><code>mul</code></td></tr><tr><td>11</td><td><code>input_rmsnorm</code></td><td><code>mul</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy</code>, <code>rsqrt</code></td><td><code>mul_1</code></td></tr><tr><td>12</td><td><code>input_rmsnorm</code></td><td><code>_to_copy_1</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>detach</code></td><td><code>add_2</code></td></tr><tr><td>13</td><td><code>input_rmsnorm</code></td><td><code>add_2</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>_to_copy_1</code></td><td><code>mul_1</code></td></tr><tr><td>14</td><td><code>input_rmsnorm</code></td><td><code>mul_1</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>mul</code>, <code>add_2</code></td><td><code>_to_copy_2</code></td></tr><tr><td>15</td><td><code>input_rmsnorm</code></td><td><code>_to_copy_2</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>mul_1</code></td><td><code>empty_like</code>, <code>mm</code></td></tr><tr><td>16</td><td><code>input_rmsnorm</code></td><td><code>empty_like</code></td><td><code>call_function</code></td><td><code>aten.empty_like.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_2</code></td><td><code>copy__4</code></td></tr><tr><td>17</td><td><code>qkv_projection</code></td><td><code>_param_constant1</code></td><td><code>get_attr</code></td><td><code>_param_constant1</code></td><td><code>[14336, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t</code></td></tr><tr><td>18</td><td><code>qkv_projection</code></td><td><code>t</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[5120, 14336]</code></td><td><code>bfloat16</code></td><td><code>_param_constant1</code></td><td><code>mm</code></td></tr><tr><td>19</td><td><code>qkv_projection</code></td><td><code>mm</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 14336]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_2</code>, <code>t</code></td><td><code>split_with_sizes</code></td></tr><tr><td>20</td><td><code>qkv_projection</code></td><td><code>split_with_sizes</code></td><td><code>call_function</code></td><td><code>aten.split_with_sizes.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>mm</code></td><td><code>getitem</code>, <code>getitem_1</code>, <code>getitem_2</code></td></tr><tr><td>21</td><td><code>qkv_projection</code></td><td><code>getitem</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 12288]</code></td><td><code>bfloat16</code></td><td><code>split_with_sizes</code></td><td><code>view</code></td></tr><tr><td>22</td><td><code>qkv_projection</code></td><td><code>getitem_1</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 1024]</code></td><td><code>bfloat16</code></td><td><code>split_with_sizes</code></td><td><code>view_3</code></td></tr><tr><td>23</td><td><code>qkv_projection</code></td><td><code>getitem_2</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 1024]</code></td><td><code>bfloat16</code></td><td><code>split_with_sizes</code></td><td><code>view_12</code></td></tr><tr><td>24</td><td><code>qkv_projection</code></td><td><code>view</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 24, 512]</code></td><td><code>bfloat16</code></td><td><code>getitem</code></td><td><code>split</code></td></tr><tr><td>25</td><td><code>qkv_projection</code></td><td><code>split</code></td><td><code>call_function</code></td><td><code>aten.split.Tensor</code></td><td><code>-</code></td><td><code>-</code></td><td><code>view</code></td><td><code>getitem_3</code>, <code>getitem_4</code></td></tr><tr><td>26</td><td><code>qkv_projection</code></td><td><code>getitem_3</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>split</code></td><td><code>clone</code></td></tr><tr><td>27</td><td><code>qkv_projection</code></td><td><code>getitem_4</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>split</code></td><td><code>clone_1</code></td></tr><tr><td>28</td><td><code>qkv_projection</code></td><td><code>clone</code></td><td><code>call_function</code></td><td><code>aten.clone.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>getitem_3</code></td><td><code>_unsafe_view</code></td></tr><tr><td>29</td><td><code>qkv_projection</code></td><td><code>_unsafe_view</code></td><td><code>call_function</code></td><td><code>aten._unsafe_view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>clone</code></td><td><code>view_1</code></td></tr><tr><td>30</td><td><code>qkv_projection</code></td><td><code>clone_1</code></td><td><code>call_function</code></td><td><code>aten.clone.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>getitem_4</code></td><td><code>_unsafe_view_1</code></td></tr><tr><td>31</td><td><code>qkv_projection</code></td><td><code>_unsafe_view_1</code></td><td><code>call_function</code></td><td><code>aten._unsafe_view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>clone_1</code></td><td><code>sigmoid</code></td></tr><tr><td>32</td><td><code>qkv_projection</code></td><td><code>view_1</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>_unsafe_view</code></td><td><code>_to_copy_3</code></td></tr><tr><td>33</td><td><code>qkv_projection</code></td><td><code>_param_constant2</code></td><td><code>get_attr</code></td><td><code>_param_constant2</code></td><td><code>[256]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach_1</code></td></tr><tr><td>34</td><td><code>qkv_projection</code></td><td><code>detach_1</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[256]</code></td><td><code>bfloat16</code></td><td><code>_param_constant2</code></td><td><code>_to_copy_4</code></td></tr><tr><td>35</td><td><code>qkv_projection</code></td><td><code>_to_copy_3</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 24, 256]</code></td><td><code>float32</code></td><td><code>view_1</code></td><td><code>mul_2</code>, <code>pow_2</code></td></tr><tr><td>36</td><td><code>qkv_projection</code></td><td><code>pow_2</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 24, 256]</code></td><td><code>float32</code></td><td><code>_to_copy_3</code></td><td><code>mean_1</code></td></tr><tr><td>37</td><td><code>qkv_projection</code></td><td><code>mean_1</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 24, 1]</code></td><td><code>float32</code></td><td><code>pow_2</code></td><td><code>add_3</code></td></tr><tr><td>38</td><td><code>qkv_projection</code></td><td><code>add_3</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 24, 1]</code></td><td><code>float32</code></td><td><code>mean_1</code></td><td><code>rsqrt_1</code></td></tr><tr><td>39</td><td><code>qkv_projection</code></td><td><code>rsqrt_1</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 24, 1]</code></td><td><code>float32</code></td><td><code>add_3</code></td><td><code>mul_2</code></td></tr><tr><td>40</td><td><code>qkv_projection</code></td><td><code>mul_2</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 256]</code></td><td><code>float32</code></td><td><code>_to_copy_3</code>, <code>rsqrt_1</code></td><td><code>mul_3</code></td></tr><tr><td>41</td><td><code>qkv_projection</code></td><td><code>_to_copy_4</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[256]</code></td><td><code>float32</code></td><td><code>detach_1</code></td><td><code>add_4</code></td></tr><tr><td>42</td><td><code>qkv_projection</code></td><td><code>add_4</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[256]</code></td><td><code>float32</code></td><td><code>_to_copy_4</code></td><td><code>mul_3</code></td></tr><tr><td>43</td><td><code>qkv_projection</code></td><td><code>mul_3</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 256]</code></td><td><code>float32</code></td><td><code>mul_2</code>, <code>add_4</code></td><td><code>_to_copy_5</code></td></tr><tr><td>44</td><td><code>qkv_projection</code></td><td><code>_to_copy_5</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>mul_3</code></td><td><code>view_2</code></td></tr><tr><td>45</td><td><code>qkv_projection</code></td><td><code>view_2</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_5</code></td><td><code>view_5</code></td></tr><tr><td>46</td><td><code>qkv_projection</code></td><td><code>view_3</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>getitem_1</code></td><td><code>_to_copy_6</code></td></tr><tr><td>47</td><td><code>qkv_projection</code></td><td><code>_param_constant3</code></td><td><code>get_attr</code></td><td><code>_param_constant3</code></td><td><code>[256]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach_2</code></td></tr><tr><td>48</td><td><code>qkv_projection</code></td><td><code>detach_2</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[256]</code></td><td><code>bfloat16</code></td><td><code>_param_constant3</code></td><td><code>_to_copy_7</code></td></tr><tr><td>49</td><td><code>qkv_projection</code></td><td><code>_to_copy_6</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 4, 256]</code></td><td><code>float32</code></td><td><code>view_3</code></td><td><code>mul_4</code>, <code>pow_3</code></td></tr><tr><td>50</td><td><code>qkv_projection</code></td><td><code>pow_3</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 4, 256]</code></td><td><code>float32</code></td><td><code>_to_copy_6</code></td><td><code>mean_2</code></td></tr><tr><td>51</td><td><code>qkv_projection</code></td><td><code>mean_2</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 4, 1]</code></td><td><code>float32</code></td><td><code>pow_3</code></td><td><code>add_5</code></td></tr><tr><td>52</td><td><code>qkv_projection</code></td><td><code>add_5</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 4, 1]</code></td><td><code>float32</code></td><td><code>mean_2</code></td><td><code>rsqrt_2</code></td></tr><tr><td>53</td><td><code>qkv_projection</code></td><td><code>rsqrt_2</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 4, 1]</code></td><td><code>float32</code></td><td><code>add_5</code></td><td><code>mul_4</code></td></tr><tr><td>54</td><td><code>qkv_projection</code></td><td><code>mul_4</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 256]</code></td><td><code>float32</code></td><td><code>_to_copy_6</code>, <code>rsqrt_2</code></td><td><code>mul_5</code></td></tr><tr><td>55</td><td><code>qkv_projection</code></td><td><code>_to_copy_7</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[256]</code></td><td><code>float32</code></td><td><code>detach_2</code></td><td><code>add_6</code></td></tr><tr><td>56</td><td><code>qkv_projection</code></td><td><code>add_6</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[256]</code></td><td><code>float32</code></td><td><code>_to_copy_7</code></td><td><code>mul_5</code></td></tr><tr><td>57</td><td><code>qkv_projection</code></td><td><code>mul_5</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 256]</code></td><td><code>float32</code></td><td><code>mul_4</code>, <code>add_6</code></td><td><code>_to_copy_8</code></td></tr><tr><td>58</td><td><code>qkv_projection</code></td><td><code>_to_copy_8</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>mul_5</code></td><td><code>view_4</code></td></tr><tr><td>59</td><td><code>qkv_projection</code></td><td><code>view_4</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 1024]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_8</code></td><td><code>view_7</code></td></tr><tr><td>60</td><td><code>rope</code></td><td><code>_tensor_constant0</code></td><td><code>get_attr</code></td><td><code>_tensor_constant0</code></td><td><code>[1048576, 64]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>index</code></td></tr><tr><td>61</td><td><code>rope</code></td><td><code>index</code></td><td><code>call_function</code></td><td><code>aten.index.Tensor</code></td><td><code>[3, 1, 64]</code></td><td><code>bfloat16</code></td><td><code>arg0_1</code>, <code>_tensor_constant0</code></td><td><code>split_1</code></td></tr><tr><td>62</td><td><code>rope</code></td><td><code>split_1</code></td><td><code>call_function</code></td><td><code>aten.split.Tensor</code></td><td><code>-</code></td><td><code>-</code></td><td><code>index</code></td><td><code>getitem_5</code>, <code>getitem_6</code></td></tr><tr><td>63</td><td><code>rope</code></td><td><code>getitem_5</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[3, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>split_1</code></td><td><code>select</code>, <code>select_1</code>, <code>select_2</code></td></tr><tr><td>64</td><td><code>rope</code></td><td><code>getitem_6</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[3, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>split_1</code></td><td><code>select_3</code>, <code>select_4</code>, <code>select_5</code></td></tr><tr><td>65</td><td><code>rope</code></td><td><code>select</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_5</code></td><td><code>clone_2</code></td></tr><tr><td>66</td><td><code>rope</code></td><td><code>clone_2</code></td><td><code>call_function</code></td><td><code>aten.clone.default</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>select</code></td><td><code>slice_2</code>, <code>slice_4</code>, <code>unsqueeze</code>, <code>unsqueeze_2</code></td></tr><tr><td>67</td><td><code>rope</code></td><td><code>select_1</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_5</code></td><td><code>slice_1</code></td></tr><tr><td>68</td><td><code>rope</code></td><td><code>slice_1</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>select_1</code></td><td><code>copy_</code></td></tr><tr><td>69</td><td><code>rope</code></td><td><code>slice_2</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>clone_2</code></td><td><code>copy_</code></td></tr><tr><td>70</td><td><code>rope</code></td><td><code>copy_</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>slice_1</code>, <code>slice_2</code></td><td>-</td></tr><tr><td>71</td><td><code>rope</code></td><td><code>select_2</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_5</code></td><td><code>slice_3</code></td></tr><tr><td>72</td><td><code>rope</code></td><td><code>slice_3</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>select_2</code></td><td><code>copy__1</code></td></tr><tr><td>73</td><td><code>rope</code></td><td><code>slice_4</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>clone_2</code></td><td><code>copy__1</code></td></tr><tr><td>74</td><td><code>rope</code></td><td><code>copy__1</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>slice_3</code>, <code>slice_4</code></td><td>-</td></tr><tr><td>75</td><td><code>rope</code></td><td><code>select_3</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_6</code></td><td><code>clone_3</code></td></tr><tr><td>76</td><td><code>rope</code></td><td><code>clone_3</code></td><td><code>call_function</code></td><td><code>aten.clone.default</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>select_3</code></td><td><code>slice_6</code>, <code>slice_8</code>, <code>unsqueeze_1</code>, <code>unsqueeze_3</code></td></tr><tr><td>77</td><td><code>rope</code></td><td><code>select_4</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_6</code></td><td><code>slice_5</code></td></tr><tr><td>78</td><td><code>rope</code></td><td><code>slice_5</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>select_4</code></td><td><code>copy__2</code></td></tr><tr><td>79</td><td><code>rope</code></td><td><code>slice_6</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>clone_3</code></td><td><code>copy__2</code></td></tr><tr><td>80</td><td><code>rope</code></td><td><code>copy__2</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 11]</code></td><td><code>bfloat16</code></td><td><code>slice_5</code>, <code>slice_6</code></td><td>-</td></tr><tr><td>81</td><td><code>rope</code></td><td><code>select_5</code></td><td><code>call_function</code></td><td><code>aten.select.int</code></td><td><code>[1, 32]</code></td><td><code>bfloat16</code></td><td><code>getitem_6</code></td><td><code>slice_7</code></td></tr><tr><td>82</td><td><code>rope</code></td><td><code>slice_7</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>select_5</code></td><td><code>copy__3</code></td></tr><tr><td>83</td><td><code>rope</code></td><td><code>slice_8</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>clone_3</code></td><td><code>copy__3</code></td></tr><tr><td>84</td><td><code>rope</code></td><td><code>copy__3</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 10]</code></td><td><code>bfloat16</code></td><td><code>slice_7</code>, <code>slice_8</code></td><td>-</td></tr><tr><td>85</td><td><code>rope</code></td><td><code>view_5</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>view_2</code></td><td><code>slice_10</code>, <code>slice_9</code></td></tr><tr><td>86</td><td><code>rope</code></td><td><code>slice_9</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 24, 64]</code></td><td><code>bfloat16</code></td><td><code>view_5</code></td><td><code>split_2</code></td></tr><tr><td>87</td><td><code>rope</code></td><td><code>slice_10</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 24, 192]</code></td><td><code>bfloat16</code></td><td><code>view_5</code></td><td><code>cat_1</code></td></tr><tr><td>88</td><td><code>rope</code></td><td><code>unsqueeze</code></td><td><code>call_function</code></td><td><code>aten.unsqueeze.default</code></td><td><code>[1, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>clone_2</code></td><td><code>mul_6</code>, <code>mul_8</code></td></tr><tr><td>89</td><td><code>rope</code></td><td><code>unsqueeze_1</code></td><td><code>call_function</code></td><td><code>aten.unsqueeze.default</code></td><td><code>[1, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>clone_3</code></td><td><code>mul_7</code>, <code>mul_9</code></td></tr><tr><td>90</td><td><code>rope</code></td><td><code>split_2</code></td><td><code>call_function</code></td><td><code>aten.split.Tensor</code></td><td><code>-</code></td><td><code>-</code></td><td><code>slice_9</code></td><td><code>getitem_7</code>, <code>getitem_8</code></td></tr><tr><td>91</td><td><code>rope</code></td><td><code>getitem_7</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>split_2</code></td><td><code>mul_6</code>, <code>mul_9</code></td></tr><tr><td>92</td><td><code>rope</code></td><td><code>getitem_8</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>split_2</code></td><td><code>mul_7</code>, <code>mul_8</code></td></tr><tr><td>93</td><td><code>rope</code></td><td><code>mul_6</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze</code>, <code>getitem_7</code></td><td><code>sub</code></td></tr><tr><td>94</td><td><code>rope</code></td><td><code>mul_7</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_1</code>, <code>getitem_8</code></td><td><code>sub</code></td></tr><tr><td>95</td><td><code>rope</code></td><td><code>sub</code></td><td><code>call_function</code></td><td><code>aten.sub.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>mul_6</code>, <code>mul_7</code></td><td><code>cat</code></td></tr><tr><td>96</td><td><code>rope</code></td><td><code>mul_8</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze</code>, <code>getitem_8</code></td><td><code>add_7</code></td></tr><tr><td>97</td><td><code>rope</code></td><td><code>mul_9</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_1</code>, <code>getitem_7</code></td><td><code>add_7</code></td></tr><tr><td>98</td><td><code>rope</code></td><td><code>add_7</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 24, 32]</code></td><td><code>bfloat16</code></td><td><code>mul_8</code>, <code>mul_9</code></td><td><code>cat</code></td></tr><tr><td>99</td><td><code>rope</code></td><td><code>cat</code></td><td><code>call_function</code></td><td><code>aten.cat.default</code></td><td><code>[1, 24, 64]</code></td><td><code>bfloat16</code></td><td><code>sub</code>, <code>add_7</code></td><td><code>cat_1</code></td></tr><tr><td>100</td><td><code>rope</code></td><td><code>cat_1</code></td><td><code>call_function</code></td><td><code>aten.cat.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>slice_10</code>, <code>cat</code></td><td><code>view_6</code></td></tr><tr><td>101</td><td><code>rope</code></td><td><code>view_6</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>cat_1</code></td><td><code>view_9</code></td></tr><tr><td>102</td><td><code>rope</code></td><td><code>view_7</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>view_4</code></td><td><code>slice_11</code>, <code>slice_12</code></td></tr><tr><td>103</td><td><code>rope</code></td><td><code>slice_11</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 4, 64]</code></td><td><code>bfloat16</code></td><td><code>view_7</code></td><td><code>split_3</code></td></tr><tr><td>104</td><td><code>rope</code></td><td><code>slice_12</code></td><td><code>call_function</code></td><td><code>aten.slice.Tensor</code></td><td><code>[1, 4, 192]</code></td><td><code>bfloat16</code></td><td><code>view_7</code></td><td><code>cat_3</code></td></tr><tr><td>105</td><td><code>rope</code></td><td><code>unsqueeze_2</code></td><td><code>call_function</code></td><td><code>aten.unsqueeze.default</code></td><td><code>[1, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>clone_2</code></td><td><code>mul_10</code>, <code>mul_12</code></td></tr><tr><td>106</td><td><code>rope</code></td><td><code>unsqueeze_3</code></td><td><code>call_function</code></td><td><code>aten.unsqueeze.default</code></td><td><code>[1, 1, 32]</code></td><td><code>bfloat16</code></td><td><code>clone_3</code></td><td><code>mul_11</code>, <code>mul_13</code></td></tr><tr><td>107</td><td><code>rope</code></td><td><code>split_3</code></td><td><code>call_function</code></td><td><code>aten.split.Tensor</code></td><td><code>-</code></td><td><code>-</code></td><td><code>slice_11</code></td><td><code>getitem_10</code>, <code>getitem_9</code></td></tr><tr><td>108</td><td><code>rope</code></td><td><code>getitem_9</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>split_3</code></td><td><code>mul_10</code>, <code>mul_13</code></td></tr><tr><td>109</td><td><code>rope</code></td><td><code>getitem_10</code></td><td><code>call_function</code></td><td><code>&lt;built-in function getitem&gt;</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>split_3</code></td><td><code>mul_11</code>, <code>mul_12</code></td></tr><tr><td>110</td><td><code>rope</code></td><td><code>mul_10</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_2</code>, <code>getitem_9</code></td><td><code>sub_1</code></td></tr><tr><td>111</td><td><code>rope</code></td><td><code>mul_11</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_3</code>, <code>getitem_10</code></td><td><code>sub_1</code></td></tr><tr><td>112</td><td><code>rope</code></td><td><code>sub_1</code></td><td><code>call_function</code></td><td><code>aten.sub.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>mul_10</code>, <code>mul_11</code></td><td><code>cat_2</code></td></tr><tr><td>113</td><td><code>rope</code></td><td><code>mul_12</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_2</code>, <code>getitem_10</code></td><td><code>add_8</code></td></tr><tr><td>114</td><td><code>rope</code></td><td><code>mul_13</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>unsqueeze_3</code>, <code>getitem_9</code></td><td><code>add_8</code></td></tr><tr><td>115</td><td><code>rope</code></td><td><code>add_8</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 4, 32]</code></td><td><code>bfloat16</code></td><td><code>mul_12</code>, <code>mul_13</code></td><td><code>cat_2</code></td></tr><tr><td>116</td><td><code>rope</code></td><td><code>cat_2</code></td><td><code>call_function</code></td><td><code>aten.cat.default</code></td><td><code>[1, 4, 64]</code></td><td><code>bfloat16</code></td><td><code>sub_1</code>, <code>add_8</code></td><td><code>cat_3</code></td></tr><tr><td>117</td><td><code>rope</code></td><td><code>cat_3</code></td><td><code>call_function</code></td><td><code>aten.cat.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>slice_12</code>, <code>cat_2</code></td><td><code>view_8</code></td></tr><tr><td>118</td><td><code>rope</code></td><td><code>view_8</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 1024]</code></td><td><code>bfloat16</code></td><td><code>cat_3</code></td><td><code>view_11</code></td></tr><tr><td>119</td><td><code>kv_cache_attention</code></td><td><code>empty</code></td><td><code>call_function</code></td><td><code>aten.empty.memory_format</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>view_10</code></td></tr><tr><td>120</td><td><code>kv_cache_attention</code></td><td><code>view_9</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>view_6</code></td><td><code>unified_attention_with_output</code></td></tr><tr><td>121</td><td><code>kv_cache_attention</code></td><td><code>view_10</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 24, 256]</code></td><td><code>bfloat16</code></td><td><code>empty</code></td><td><code>unified_attention_with_output</code>, <code>view_13</code></td></tr><tr><td>122</td><td><code>kv_cache_attention</code></td><td><code>view_11</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>view_8</code></td><td><code>unified_attention_with_output</code>, <code>unified_kv_cache_update</code></td></tr><tr><td>123</td><td><code>kv_cache_attention</code></td><td><code>view_12</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 4, 256]</code></td><td><code>bfloat16</code></td><td><code>getitem_2</code></td><td><code>unified_attention_with_output</code>, <code>unified_kv_cache_update</code></td></tr><tr><td>124</td><td><code>kv_cache_attention</code></td><td><code>unified_kv_cache_update</code></td><td><code>call_function</code></td><td><code>vllm.unified_kv_cache_update.default</code></td><td><code>[0]</code></td><td><code>bfloat16</code></td><td><code>view_11</code>, <code>view_12</code></td><td><code>unified_attention_with_output</code></td></tr><tr><td>125</td><td><code>kv_cache_attention</code></td><td><code>unified_attention_with_output</code></td><td><code>call_function</code></td><td><code>vllm.unified_attention_with_output.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>view_9</code>, <code>view_10</code>, <code>view_11</code>, <code>view_12</code>, <code>unified_kv_cache_update</code></td><td>-</td></tr><tr><td>126</td><td><code>attention_output</code></td><td><code>view_13</code></td><td><code>call_function</code></td><td><code>aten.view.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>view_10</code></td><td><code>mul_14</code></td></tr><tr><td>127</td><td><code>attention_output</code></td><td><code>sigmoid</code></td><td><code>call_function</code></td><td><code>aten.sigmoid.default</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>_unsafe_view_1</code></td><td><code>mul_14</code></td></tr><tr><td>128</td><td><code>attention_output</code></td><td><code>mul_14</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 6144]</code></td><td><code>bfloat16</code></td><td><code>view_13</code>, <code>sigmoid</code></td><td><code>mm_1</code></td></tr><tr><td>129</td><td><code>output_projection</code></td><td><code>_param_constant4</code></td><td><code>get_attr</code></td><td><code>_param_constant4</code></td><td><code>[5120, 6144]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_1</code></td></tr><tr><td>130</td><td><code>output_projection</code></td><td><code>t_1</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[6144, 5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant4</code></td><td><code>mm_1</code></td></tr><tr><td>131</td><td><code>output_projection</code></td><td><code>mm_1</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>mul_14</code>, <code>t_1</code></td><td><code>copy__4</code></td></tr><tr><td>132</td><td><code>output_projection</code></td><td><code>copy__4</code></td><td><code>call_function</code></td><td><code>aten.copy_.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>empty_like</code>, <code>mm_1</code></td><td><code>add_9</code></td></tr><tr><td>133</td><td><code>output_projection</code></td><td><code>_param_constant5</code></td><td><code>get_attr</code></td><td><code>_param_constant5</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>detach_3</code></td></tr><tr><td>134</td><td><code>output_projection</code></td><td><code>detach_3</code></td><td><code>call_function</code></td><td><code>aten.detach.default</code></td><td><code>[5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant5</code></td><td><code>_to_copy_10</code></td></tr><tr><td>135</td><td><code>output_projection</code></td><td><code>add_9</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>add</code>, <code>copy__4</code></td><td><code>_to_copy_9</code>, <code>output</code></td></tr><tr><td>136</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_9</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>add_9</code></td><td><code>mul_15</code>, <code>pow_4</code></td></tr><tr><td>137</td><td><code>post_attention_rmsnorm</code></td><td><code>pow_4</code></td><td><code>call_function</code></td><td><code>aten.pow.Tensor_Scalar</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy_9</code></td><td><code>mean_3</code></td></tr><tr><td>138</td><td><code>post_attention_rmsnorm</code></td><td><code>mean_3</code></td><td><code>call_function</code></td><td><code>aten.mean.dim</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>pow_4</code></td><td><code>add_10</code></td></tr><tr><td>139</td><td><code>post_attention_rmsnorm</code></td><td><code>add_10</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>mean_3</code></td><td><code>rsqrt_3</code></td></tr><tr><td>140</td><td><code>post_attention_rmsnorm</code></td><td><code>rsqrt_3</code></td><td><code>call_function</code></td><td><code>aten.rsqrt.default</code></td><td><code>[1, 1]</code></td><td><code>float32</code></td><td><code>add_10</code></td><td><code>mul_15</code></td></tr><tr><td>141</td><td><code>post_attention_rmsnorm</code></td><td><code>mul_15</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>_to_copy_9</code>, <code>rsqrt_3</code></td><td><code>mul_16</code></td></tr><tr><td>142</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_10</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>detach_3</code></td><td><code>add_11</code></td></tr><tr><td>143</td><td><code>post_attention_rmsnorm</code></td><td><code>add_11</code></td><td><code>call_function</code></td><td><code>aten.add.Tensor</code></td><td><code>[5120]</code></td><td><code>float32</code></td><td><code>_to_copy_10</code></td><td><code>mul_16</code></td></tr><tr><td>144</td><td><code>post_attention_rmsnorm</code></td><td><code>mul_16</code></td><td><code>call_function</code></td><td><code>aten.mul.Tensor</code></td><td><code>[1, 5120]</code></td><td><code>float32</code></td><td><code>mul_15</code>, <code>add_11</code></td><td><code>_to_copy_11</code></td></tr><tr><td>145</td><td><code>post_attention_rmsnorm</code></td><td><code>_to_copy_11</code></td><td><code>call_function</code></td><td><code>aten._to_copy.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>mul_16</code></td><td><code>mm_2</code></td></tr><tr><td>146</td><td><code>mlp</code></td><td><code>_param_constant6</code></td><td><code>get_attr</code></td><td><code>_param_constant6</code></td><td><code>[34816, 5120]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_2</code></td></tr><tr><td>147</td><td><code>mlp</code></td><td><code>t_2</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[5120, 34816]</code></td><td><code>bfloat16</code></td><td><code>_param_constant6</code></td><td><code>mm_2</code></td></tr><tr><td>148</td><td><code>mlp</code></td><td><code>mm_2</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 34816]</code></td><td><code>bfloat16</code></td><td><code>_to_copy_11</code>, <code>t_2</code></td><td><code>silu_and_mul</code></td></tr><tr><td>149</td><td><code>mlp</code></td><td><code>empty_1</code></td><td><code>call_function</code></td><td><code>aten.empty.memory_format</code></td><td><code>[1, 17408]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>mm_3</code>, <code>silu_and_mul</code></td></tr><tr><td>150</td><td><code>mlp</code></td><td><code>silu_and_mul</code></td><td><code>call_function</code></td><td><code>_C.silu_and_mul.default</code></td><td><code>-</code></td><td><code>-</code></td><td><code>mm_2</code>, <code>empty_1</code></td><td>-</td></tr><tr><td>151</td><td><code>mlp</code></td><td><code>_param_constant7</code></td><td><code>get_attr</code></td><td><code>_param_constant7</code></td><td><code>[5120, 17408]</code></td><td><code>bfloat16</code></td><td>-</td><td><code>t_3</code></td></tr><tr><td>152</td><td><code>mlp</code></td><td><code>t_3</code></td><td><code>call_function</code></td><td><code>aten.t.default</code></td><td><code>[17408, 5120]</code></td><td><code>bfloat16</code></td><td><code>_param_constant7</code></td><td><code>mm_3</code></td></tr><tr><td>153</td><td><code>mlp</code></td><td><code>mm_3</code></td><td><code>call_function</code></td><td><code>aten.mm.default</code></td><td><code>[1, 5120]</code></td><td><code>bfloat16</code></td><td><code>empty_1</code>, <code>t_3</code></td><td><code>output</code></td></tr><tr><td>154</td><td><code>layer_output</code></td><td><code>output</code></td><td><code>output</code></td><td><code>output</code></td><td><code>-</code></td><td><code>-</code></td><td><code>add_9</code>, <code>mm_3</code></td><td>-</td></tr></tbody></table></article><article id="vis"><h1>B. 手工解释与张量可视化（fx_process_visualization.md）</h1><h1 id="input7_layer3-FX-Process-">input7_layer3 FX Process 手工解释与张量可视化</h1>
+<p>本文件对应 <code>selected:07</code> 的 full-attention decode 固定输入路径：第 7 次 forward、第 3 层，<code>q/past/kv=1/20585/20586</code>。以下 10 个 process 覆盖全部 155 个 FX nodes。</p>
+<h3 id="Runtime-FX-inputs">Runtime FX inputs</h3>
+<p>节点范围为 #0–#2。</p>
+<p><strong>是什么</strong>：三通道 position ids <code>[3,1]</code>、single-token hidden <code>[1,5120]</code> 和 residual <code>[1,5120]</code>。</p>
+<p><strong>为什么需要</strong>：decode 的当前 token 仍要执行 residual fusion、MRoPE 与 full attention；三者共享唯一 token coordinate 0。</p>
+<p><strong>怎么做/计算</strong>：#0–#2 只暴露 tensors。#0 供 rotary table index；#1/#2 在 #5 相加。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_in [1,5120]                                  Formula: H_in=sampled_decode_hidden
+Tensor: R_in [1,5120]                                  Formula: R_in=sampled_decode_residual
+aligned current rows                            ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h[0,0..5119] / r[0,0..5119]              │  ◀── current token
+                                                       └──────────────────────────────────────────┘
+
+Position channel axis 0..2                             Token axis 0..0
+                                                       ▲                   ▲
+Tensor: P [3,1]                                        Formula: P=sampled_MRoPE_positions
+position values                                 ──▶    ┌──────────────────────────────────────────┐
+                                                       │ p[0,0], p[1,0], p[2,0]                   │  ◀── three position channels
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Input-RMSNorm">Input RMSNorm</h3>
+<p>节点范围为 #3–#16。</p>
+<p><strong>是什么</strong>：single-token residual add、Gemma-style RMSNorm与 attention buffer allocation。</p>
+<p><strong>为什么需要</strong>：Q/gate/K/V projection 需要 normalized row；attention后还要接回未归一化 <code>R0</code>。</p>
+<p><strong>怎么做/计算</strong>：#3/#4 读取/detach <code>[5120]</code> weight；#5 得 <code>R0=H_in+R_in</code>。#6 fp32，#7 square，#8 mean over 5120→<code>[1,1]</code>，#9 epsilon，#10 rsqrt，#11 normalize；#12 weight fp32，#13 +1，#14 scale，#15 bf16→<code>[1,5120]</code>。#16 分配同形未初始化 buffer。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: R0 [1,5120]                                    Formula: R0=H_in+R_in
+residual fusion                                 ──▶    ┌──────────────────────────────────────────┐
+                                                       │ r0[0,0] ... r0[0,5119]                   │  ◀── elementwise add
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Reduced Hidden axis 0..0
+                                                       ▲                     ▲
+Tensor: InvRMS0 [1,1]                                  Formula: 1/sqrt(mean_h(fp32(R0)^2)+1e-6)
+single RMS scale                                ──▶    ┌──────────────────────────────────────────┐
+                                                       │ inv0[0]                                  │  ◀── broadcast over Hidden
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_norm [1,5120]                                Formula: bf16(fp32(R0)*InvRMS0*(1+W0))
+normalized projection row                       ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_norm[0,0] ... h_norm[0,5119]           │  ◀── shared QGKV source
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Attention-GDN-input-projections-and-head-reshape">Attention/GDN input projections and head reshape</h3>
+<p>节点范围为 #17–#59。</p>
+<p><strong>是什么</strong>：single-token fused Q/gate/K/V projection、Q/gate split 和 Q/K head RMSNorm。</p>
+<p><strong>为什么需要</strong>：unified attention 接收 24 Q heads与4 KV heads；gate保留为 24×256 channels。</p>
+<p><strong>怎么做/计算</strong>：#17/#18 准备 <code>[14336,5120]</code> weight，#19 得 <code>[1,14336]</code>；#20–#23 按 <code>[12288,1024,1024]</code> split。#24–#31 view Q-gate <code>[1,24,512]</code>、等分 Q/gate <code>[1,24,256]</code>、clone/flatten。#32–#45 对 Q 每头 256 dims执行 fp32 square/mean/epsilon/rsqrt/weight <code>(1+w)</code>/bf16并 flatten <code>[1,6144]</code>。#46–#59 对 K <code>[1,4,256]</code> 同样处理并 flatten <code>[1,1024]</code>；V保持 <code>[1,1024]</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Fused channel axis
+                                                       0        12287 12288 13311 13312       14335
+                                                       ▲            ▲ ▲         ▲ ▲               ▲
+Tensor: QGKV [1,14336]                                 Formula: QGKV=H_norm@W_qgkv^T
+fused channel split                             ──▶    ┌──────────────────────┬──────────┬──────────┐
+                                                       │ Q_GATE [1,12288]     │ K[1,1024]│ V[1,1024]│ ◀── current token
+                                                       └──────────────────────┴──────────┴──────────┘
+
+Query-head axis 0..23                                  Head dimension
+                                                       0                  255 256                 511
+                                                       ▲                    ▲ ▲                     ▲
+Tensor: QGate [1,24,512]                               Formula: QGate=[Q_raw|Gate]
+per-head partition                              ──▶    ┌──────────────────────┬─────────────────────┐
+                                                       │ Q_RAW [1,24,256]     │ GATE [1,24,256]     │  ◀── same head coordinates
+                                                       └──────────────────────┴─────────────────────┘
+
+Head axis Q=0..23 / K=0..3                             Head dimension
+                                                       0                                      255
+                                                       ▲                                         ▲
+Tensor: Qn [1,24,256]                                  Formula: Qn=RMSNorm_head(Q_raw)
+Tensor: Kn [1,4,256]                                   Formula: Kn=RMSNorm_head(K_raw)
+normalized heads                                ──▶    ┌──────────────────────────────────────────┐
+                                                       │ qn[0,h,0..255] / kn[0,j,0..255]          │  ◀── h=0..23, j=0..3
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="RoPE-position-embedding">RoPE position embedding</h3>
+<p>节点范围为 #60–#118。</p>
+<p><strong>是什么</strong>：single-token MRoPE lookup、cos/sin interleave 与 Q/K partial rotation。</p>
+<p><strong>为什么需要</strong>：当前 token 的 absolute/multichannel position 要进入 Q/K，后 192 dims保持 pass-through。</p>
+<p><strong>怎么做/计算</strong>：#60/#61 按 <code>P</code> 从 <code>[1048576,64]</code> table取得 <code>[3,1,64]</code>；#62–#64 得 cos/sin <code>[3,1,32]</code>。#65–#74 以 cos channel0 clone为底，copy channel1 <code>[1:33:3]</code> 11列和 channel2 <code>[2:30:3]</code> 10列；#75–#84 对 sin 对称。#85–#101 将 Q <code>[1,24,256]</code> 切 64 rotary/192 pass，再把 64分32+32并计算 <code>x0*c-x1*s</code>、<code>x1*c+x0*s</code>。#102–#118 对 K <code>[1,4,256]</code> 同样处理。</p>
+<pre class="diagram"><code>Position channel axis 0..2                             Table feature axis
+                                                       0                 31 32                63
+                                                       ▲                   ▲ ▲                   ▲
+Tensor: CS_raw [3,1,64]                                Formula: CS_raw=RotaryTable[P]=[COS_raw|SIN_raw]
+current position lookup                         ──▶    ┌─────────────────────┬─────────────────────┐
+                                                       │ COS_RAW [3,1,32]    │ SIN_RAW [3,1,32]    │  ◀── one token
+                                                       └─────────────────────┴─────────────────────┘
+
+Token axis 0..0                                        Rotary scalar axis
+                                                       0                                      31
+                                                       ▲                                         ▲
+Tensor: Cos,Sin [1,32]                                 Formula: interleave(channel0,channel1[11],channel2[10])
+current rotary scalars                          ──▶    ┌──────────────────────────────────────────┐
+                                                       │ cos[0,0..31] / sin[0,0..31]              │  ◀── broadcast to all heads
+                                                       └──────────────────────────────────────────┘
+
+Head axis Q=0..23 / K=0..3                             Head dimension
+                                                       0          31 32       63 64            255
+                                                       ▲            ▲ ▲         ▲ ▲                ▲
+Tensor: QK_rot [1,heads,256]                           Formula: [x0*c-x1*s|x1*c+x0*s|x_pass]
+partial rotated heads                           ──▶    ┌─────────────┬─────────────┬────────────────┐
+                                                       │ ROT_FIRST32 │ ROT_SECOND32│ PASS_192       │  ◀── d=0..255
+                                                       └─────────────┴─────────────┴────────────────┘</code></pre>
+<h3 id="KV-cache-update-and-unified-full-attention">KV-cache update and unified full attention</h3>
+<p>节点范围为 #119–#125。</p>
+<p><strong>是什么</strong>：single-token Q/K/V views、output allocation、opaque cache update 与 opaque unified attention。</p>
+<p><strong>为什么需要</strong>：当前 K/V 要把 cache 从 20585推进到20586，当前 Q则读取 backend生成 one-token context。</p>
+<p><strong>怎么做/计算</strong>：#119 分配 <code>[1,6144]</code>；#120/#121 view Q/output <code>[1,24,256]</code>，#122/#123 view K/V <code>[1,4,256]</code>。#124 以 layer-3 prefix mutate external cache，返回 <code>[0]</code> dependency；snapshot <code>[2,28,784,4,256]</code>。#125 写 output。内部 QK、mask、softmax、value reduction和 kernels均未展开。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Head dimension
+                                                       0                                      255
+                                                       ▲                                         ▲
+Tensor: Q [1,24,256]                                   Formula: Q=reshape(Q_rot)
+Tensor: K,V [1,4,256]                                  Formula: K=reshape(K_rot); V=reshape(V_proj)
+current token heads                             ──▶    ┌──────────────────────────────────────────┐
+                                                       │ Q_HEADS_0_TO_23 / KV_HEADS_0_TO_3        │  ◀── token coordinate 0
+                                                       └──────────────────────────────────────────┘
+
+Snapshot-local block axis 0..27                        Last dimensions KV-head x Head-dim
+                                                       0                                      255
+                                                       ▲                                         ▲
+Tensor: Cache_entry [2,28,784,4,256]                   Formula: Cache_next=OpaqueCacheUpdate(Cache_entry,K,V)
+decode entry cache                              ──▶    ┌──────────────────────────────────────────┐
+                                                       │ ACTIVE_IDS: 0,4..30; 784 x 4 x 256       │  ◀── mutation internals opaque
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Merged query-head channels
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: A_out [1,6144]                                 Formula: A_out=OpaqueUnifiedAttention(Q,K,V,Cache_next)
+one-token context                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ context[0,0] ... context[0,6143]         │  ◀── observed output boundary
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Attention-output-gate-and-hidden-reshape">Attention output gate and hidden reshape</h3>
+<p>节点范围为 #126–#128。</p>
+<p><strong>是什么</strong>：single-token attention output merge 与 sigmoid gate。</p>
+<p><strong>为什么需要</strong>：24×256 context channels各自配有一个 output gate。</p>
+<p><strong>怎么做/计算</strong>：#126 view output为 <code>[1,6144]</code>；#127 sigmoid gate为 <code>[1,6144]</code>；#128逐元素乘。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Mixer-channel axis
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: A_flat [1,6144]                                Formula: A_flat=merge_heads(A_out)
+context row                                     ──▶    ┌──────────────────────────────────────────┐
+                                                       │ a[0,0] ... a[0,6143]                     │  ◀── merged heads
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Mixer-channel axis
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: Gate01 [1,6144]                                Formula: Gate01=sigmoid(Gate_flat)
+gate row                                        ──▶    ┌──────────────────────────────────────────┐
+                                                       │ g[0,0] ... g[0,6143]                     │  ◀── aligned values in (0,1)
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Mixer-channel axis
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: A_gated [1,6144]                               Formula: A_gated=A_flat*Gate01
+gated context                                   ──▶    ┌──────────────────────────────────────────┐
+                                                       │ a_g[0,j]=a[0,j]*g[0,j], j=0..6143        │  ◀── elementwise result
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Mixer-output-projection-and-residual">Mixer output projection and residual</h3>
+<p>节点范围为 #129–#135。</p>
+<p><strong>是什么</strong>：6144→5120 projection、buffer copy 与 <code>R0</code> add。</p>
+<p><strong>为什么需要</strong>：gated attention row要回到 hidden width并接回 residual stream。</p>
+<p><strong>怎么做/计算</strong>：#129/#130 准备 <code>[5120,6144]</code> weight；#131 得 <code>[1,5120]</code>，#132 copy到 buffer。#133/#134 读取并 detach下一 norm weight；#135 得 <code>R_attn=projected+R0</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Mixer-channel axis
+                                                       0                                      6143
+                                                       ▲                                         ▲
+Tensor: A_gated [1,6144]                               Formula: source=A_flat*Gate01
+projection source                               ──▶    ┌──────────────────────────────────────────┐
+                                                       │ a_g[0,0] ... a_g[0,6143]                 │  ◀── one row
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: P_attn [1,5120]                                Formula: P_attn=A_gated@W_out^T
+Tensor: R_attn [1,5120]                                Formula: R_attn=P_attn+R0
+project-and-add                                 ──▶    ┌──────────────────────────────────────────┐
+                                                       │ p[0,h]+r0[0,h]=r_attn[0,h]               │  ◀── h=0..5119
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Post-attention-RMSNorm">Post-attention RMSNorm</h3>
+<p>节点范围为 #136–#145。</p>
+<p><strong>是什么</strong>：single residual row 上的 post-attention RMSNorm。</p>
+<p><strong>为什么需要</strong>：MLP 要接收 normalized bf16 row。</p>
+<p><strong>怎么做/计算</strong>：#136 fp32，#137 square，#138 mean→<code>[1,1]</code>，#139 epsilon，#140 rsqrt，#141 normalize；#142 weight fp32，#143 +1，#144 scale，#145 bf16。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: R32 [1,5120]                                   Formula: R32=fp32(R_attn)
+RMS source                                      ──▶    ┌──────────────────────────────────────────┐
+                                                       │ r32[0,0]^2 ... r32[0,5119]^2             │  ◀── Hidden reduction
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Reduced Hidden axis 0..0
+                                                       ▲                     ▲
+Tensor: InvRMS1 [1,1]                                  Formula: 1/sqrt(mean_h(R32^2)+1e-6)
+single scale                                    ──▶    ┌──────────────────────────────────────────┐
+                                                       │ inv1[0]                                  │  ◀── broadcast to 5120 dims
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_mlp [1,5120]                                 Formula: bf16(R32*InvRMS1*(1+W1))
+normalized MLP row                              ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_mlp[0,0] ... h_mlp[0,5119]             │  ◀── current token
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Gated-MLP-projections">Gated MLP projections</h3>
+<p>节点范围为 #146–#153。</p>
+<p><strong>是什么</strong>：single-token gate/up expansion、SiLU-product 与 down projection。</p>
+<p><strong>为什么需要</strong>：提供 token-wise nonlinear channel mixing并恢复 hidden width。</p>
+<p><strong>怎么做/计算</strong>：#146/#147 准备 <code>[34816,5120]</code> weight；#148 得 <code>[1,34816]=[gate|up]</code>。#149 分配 <code>[1,17408]</code>，#150 fused boundary写 <code>SiLU(gate)*up</code>。#151/#152 准备 down weight，#153 得 <code>[1,5120]</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Expanded-channel axis
+                                                       0                  17407 17408          34815
+                                                       ▲                      ▲ ▲                  ▲
+Tensor: GU [1,34816]                                   Formula: GU=H_mlp@W_gate_up^T=[GATE|UP]
+expanded row                                    ──▶    ┌───────────────────────┬────────────────────┐
+                                                       │ GATE [1,17408]        │ UP [1,17408]       │  ◀── paired regions
+                                                       └───────────────────────┴────────────────────┘
+
+Token axis 0..0                                        Intermediate axis
+                                                       0                                     17407
+                                                       ▲                                         ▲
+Tensor: M [1,17408]                                    Formula: M=SiLU(GATE)*UP
+nonlinear row                                   ──▶    ┌──────────────────────────────────────────┐
+                                                       │ m[0,j]=silu(g[0,j])*u[0,j]               │  ◀── j=0..17407
+                                                       └──────────────────────────────────────────┘
+
+Token axis 0..0                                        Hidden axis
+                                                       0                                      5119
+                                                       ▲                                         ▲
+Tensor: H_out [1,5120]                                 Formula: H_out=M@W_down^T
+decode output                                   ──▶    ┌──────────────────────────────────────────┐
+                                                       │ h_out[0,0] ... h_out[0,5119]             │  ◀── restored width
+                                                       └──────────────────────────────────────────┘</code></pre>
+<h3 id="Layer-output">Layer output</h3>
+<p>节点范围为 #154。</p>
+<p><strong>是什么</strong>：single-token hidden/residual tuple。</p>
+<p><strong>为什么需要</strong>：下一 layer 同时接收 MLP output 与 residual。</p>
+<p><strong>怎么做/计算</strong>：#154 只返回 <code>(mm_3,add_9)</code>，shape 均 <code>[1,5120]</code>。</p>
+<pre class="diagram"><code>Token axis 0..0                                        Hidden axis 0..5119
+                                                       ▲                     ▲
+Tensor: H_out [1,5120]                                 Formula: H_out=MLP_down(H_mlp)
+hidden return                                   ──▶    [H_OUT_ROW]                                ◀── tuple item 0
+
+Tensor: R_attn [1,5120]                                Formula: R_attn=ProjectedAttention+R0
+residual return                                 ──▶    [RESIDUAL_ROW]                              ◀── tuple item 1
+
+Tensor: LayerTuple                                     Formula: LayerTuple=(H_out,R_attn)
+packaged output                                 ──▶    [(1,5120),(1,5120)]                        ◀── no new arithmetic</code></pre></article></body></html>

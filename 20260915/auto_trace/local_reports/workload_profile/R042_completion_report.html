@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>R042 完成报告（FX process 重建与可视化）</title><style>
+body{font-family:system-ui,-apple-system,"Noto Sans CJK SC","PingFang SC",sans-serif;max-width:1100px;margin:40px auto;padding:0 24px;color:#182536;background:#f5f7fa;line-height:1.65}
+section,article{background:#fff;border:1px solid #dce2e8;border-radius:12px;padding:24px 28px;margin:20px 0}
+h1{font-size:1.6em}h2{font-size:1.3em;border-bottom:1px solid #e3e8ee;padding-bottom:6px;margin-top:1.6em}h3{font-size:1.1em;margin-top:1.4em}
+a{color:#1765ad;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:#eef2f6;padding:1px 5px;border-radius:4px}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.45}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre.diagram{background:#fbfcfd;color:#182536;border:1px solid #dce2e8}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.93em}th,td{border:1px solid #dce2e8;padding:6px 10px;text-align:left;vertical-align:top}th{background:#eef2f6}
+nav.top{font-size:.9em;margin-bottom:12px}nav.top a{margin-right:14px}
+.muted{color:#5b6b7c;font-size:.9em}.tag{display:inline-block;background:#eef2f6;border-radius:999px;padding:1px 10px;font-size:.8em;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{border:1px solid #dce2e8;border-radius:10px;padding:14px 16px;background:#fbfcfd}.card h3{margin:0 0 6px;font-size:1.02em}
+.toc{columns:2;column-gap:32px;font-size:.92em}.toc li{break-inside:avoid}
+</style></head><body><nav class="top"><a href="index.html">← 负载分析索引</a></nav><h1>R042 完成报告（FX process 重建与可视化）</h1><p class="muted">源文件：<code>auto_trace/workload_profile/runtime/20260729T050800Z-fx-89687ae2/artifacts/R042/completion_report.md</code></p><article><h1 id="R042-">R042 完成报告</h1>
+<p>R042 已按 R032 handoff 的原始顺序完成 9 个 Qwen3.5-27B 固定输入 FX DAG 的 process 重建与手工可视化。共覆盖 1,079 个 FX 节点，严格且无重叠地 划分为 86 个 dependency-ordered processes；每个事件均同时提供机器可读 JSON、生成式重建 Markdown、逐节点 CSV，以及独立的手工 <code>fx_process_visualization.md</code> companion。</p>
+<p>每个 process 的 companion 均以中文回答“是什么 / 为什么需要 / 怎么做/计算”，并在英文字符图中标出真实观测 shape、轴起止、代表元素、 数据流指针及平齐的 tensor/region 边界。最终独立验证逐项检查了 9 个事件、 86 个 process 的完整 FX 节点引用，以及所有图示的语言、shape、指针、 轴端点和矩形/内部 region 几何。</p>
+<p>事件清单：</p>
+<ul><li><code>input1_layer0</code> / <code>selected:01</code>：linear_attention，prefill_chunk，77 nodes / 9 processes，<code>q/past/kv=4096/0/4096</code></li><li><code>input1_layer3</code> / <code>selected:02</code>：full_attention，prefill_chunk，155 nodes / 10 processes，<code>q/past/kv=4096/0/4096</code></li><li><code>input2_layer31</code> / <code>selected:03</code>：full_attention，prefill_chunk，155 nodes / 10 processes，<code>q/past/kv=4096/4096/8192</code></li><li><code>input6_layer62</code> / <code>selected:04</code>：linear_attention，prefill_chunk，78 nodes / 9 processes，<code>q/past/kv=105/20480/20585</code></li><li><code>input6_layer63</code> / <code>selected:05</code>：full_attention，prefill_chunk，155 nodes / 10 processes，<code>q/past/kv=105/20480/20585</code></li><li><code>input7_layer0</code> / <code>selected:06</code>：linear_attention，decode，74 nodes / 9 processes，<code>q/past/kv=1/20585/20586</code></li><li><code>input7_layer3</code> / <code>selected:07</code>：full_attention，decode，155 nodes / 10 processes，<code>q/past/kv=1/20585/20586</code></li><li><code>input29_layer62</code> / <code>selected:08</code>：linear_attention，decode，75 nodes / 9 processes，<code>q/past/kv=1/20607/20608</code></li><li><code>input29_layer63</code> / <code>selected:09</code>：full_attention，decode，155 nodes / 10 processes，<code>q/past/kv=1/20607/20608</code></li></ul>
+<p>证据边界保持不变：这些是固定输入路径的 ATen/custom-op DAG；process 名称 是规则推导的结构分区，不是恢复出的模块所有权。GDN core、KV-cache mutation 和 unified attention 的内部 kernel/计算仍然不透明。R042 未加载或执行 meta-storage GraphModule，未把理论 FLOPs 或 FX 节点解释为实测延迟，也未 声称并发、分布式、剪枝、early-exit 或未观测分支覆盖。</p></article></body></html>

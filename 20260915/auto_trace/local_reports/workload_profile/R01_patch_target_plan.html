@@ -1,0 +1,68 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>R01 Trace Patch Target Plan</title><style>
+body{font-family:system-ui,-apple-system,"Noto Sans CJK SC","PingFang SC",sans-serif;max-width:1100px;margin:40px auto;padding:0 24px;color:#182536;background:#f5f7fa;line-height:1.65}
+section,article{background:#fff;border:1px solid #dce2e8;border-radius:12px;padding:24px 28px;margin:20px 0}
+h1{font-size:1.6em}h2{font-size:1.3em;border-bottom:1px solid #e3e8ee;padding-bottom:6px;margin-top:1.6em}h3{font-size:1.1em;margin-top:1.4em}
+a{color:#1765ad;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:#eef2f6;padding:1px 5px;border-radius:4px}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.45}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre.diagram{background:#fbfcfd;color:#182536;border:1px solid #dce2e8}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.93em}th,td{border:1px solid #dce2e8;padding:6px 10px;text-align:left;vertical-align:top}th{background:#eef2f6}
+nav.top{font-size:.9em;margin-bottom:12px}nav.top a{margin-right:14px}
+.muted{color:#5b6b7c;font-size:.9em}.tag{display:inline-block;background:#eef2f6;border-radius:999px;padding:1px 10px;font-size:.8em;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{border:1px solid #dce2e8;border-radius:10px;padding:14px 16px;background:#fbfcfd}.card h3{margin:0 0 6px;font-size:1.02em}
+.toc{columns:2;column-gap:32px;font-size:.92em}.toc li{break-inside:avoid}
+</style></head><body><nav class="top"><a href="index.html">← 负载分析索引</a></nav><h1>R01 Trace Patch Target Plan</h1><p class="muted">源文件：<code>auto_trace/workload_profile/runtime/20260729T050800Z-fx-89687ae2/artifacts/R01/patch_target_plan.md</code></p><article><h1 id="R01-Trace-Patch-Target-Plan">R01 Trace Patch Target Plan</h1>
+<p>运行：<code>20260729T050800Z-fx-89687ae2</code> 源码：<code>pra2026-bh408@3d03614452cd0a925abc82a7686560ff80252dfa</code> 模型：Qwen3.5-27B，64 层（48 层 <code>linear_attention</code>、16 层 <code>full_attention</code>）</p>
+<h2 id="Question">Question</h2>
+<p>在真实 Qwen3.5-27B vLLM V1 ROCm/DCU serving 请求中：</p>
+<ul><li>当前是哪个请求、engine 调用和逐请求阶段（prefill、decode、mixed 或 empty）？</li><li>scheduler 如何把 token/cache 决策变成 worker batch 和 model forward？</li><li>64 个 hybrid decoder layer 中，哪个 <code>layer_idx</code> 选择了 GDN linear-attention，哪个选择了 ROCm full-attention？</li><li>KV cache 如何命中、分配、复用和释放？</li><li>sampler/output 如何产生 token 并结束请求？</li><li>哪些最小元数据足以证明这些状态变化，同时不复制 tensor 内容、不触发设备同步？</li></ul>
+<p>未选择 API ingress：当前问题从 <code>EngineCore</code> 开始，scheduler 已持有 <code>request_id</code>；API 层不能解释模型算法路径。</p>
+<h2 id="Patch-targets">Patch targets</h2>
+<ol><li><code>EngineCore.step</code> 和 <code>EngineCore.step_with_batch_queue</code></li></ol>
+<p>why：这是同时覆盖同步路径、异步 batch queue 填充/排空、scheduler 更新和 client output 的最高语义边界。</p>
+<p>join keys：<code>run_id</code>、<code>contract_id</code>、本地单调 <code>engine_call_id</code>、<code>event_index</code>、<code>rank</code>。</p>
+<p>fields：入口名称、queue depth 前后值、是否仍有请求、是否执行模型、返回/完成 output 数、<code>duration_ns</code>。</p>
+<ol><li><code>Scheduler.schedule</code> 和 <code>Scheduler.update_from_output</code></li></ol>
+<p>why：前者作出请求/token/cache 决策并推进 computed-token 状态，后者用同一个 <code>SchedulerOutput</code> 回收 sample、finish 和 client output。</p>
+<p>join keys：<code>engine_call_id</code>、本地 <code>schedule_id</code>、<code>batch_id</code>、<code>request_id</code>。</p>
+<p>fields：有序请求、逐请求 phase、batch phase、scheduler prompt length、generated/computed 前后值、scheduled token 数、waiting/running 前后值、preempt/finish、host-side token id/count、finish reason。</p>
+<ol><li><code>GPUModelRunner._prepare_inputs</code> 和 <code>_build_attention_metadata</code></li></ol>
+<p>why：这是 scheduler token 数首次成为实际 request position、q/past/kv length 和 attention metadata 的位置。</p>
+<p>join keys：<code>batch_id</code>、<code>forward_id</code>、<code>request_id</code>、<code>batch_position</code>、<code>rank/worker/device</code>。</p>
+<p>fields：请求顺序、prefill/decode 数、逐请求 token/q/past/kv length、unpadded/padded token 数、metadata type，以及 block table/slot mapping 的 shape。</p>
+<ol><li><code>GPUModelRunner.execute_model</code></li></ol>
+<p>why：把一个 scheduler batch 连接到一个 worker forward，并包围全部 layer/helper 事件。</p>
+<p>join keys：<code>batch_id</code>、<code>forward_id</code>、<code>rank/worker/device</code>。</p>
+<p>fields：batch phase、请求数、scheduled token 总数、输入 shape 摘要、result type、是否真正执行、<code>duration_ns</code>。</p>
+<ol><li><code>Qwen3_5DecoderLayer.forward</code>（继承自 <code>Qwen3NextDecoderLayer.forward</code>）</li></ol>
+<p>why：这是证明 64 层实际调用以及 <code>layer_type</code> 分支选择的最小公共边界。</p>
+<p>join keys：<code>batch_id</code>、<code>forward_id</code>、<code>layer_idx</code>、<code>layer_occurrence</code>、<code>rank/worker</code>。</p>
+<p>fields：<code>layer_type</code>、phase、q/past/kv length、hidden/residual/position 输入输出 shape、<code>duration_ns</code>。</p>
+<p>注意：production <code>torch.compile</code> 会绕过 Python layer wrapper。层级事件必须来自单独声明、相同确定性请求的 <code>--enforce-eager</code> trace；compiled 模式零行不能解释为“层未执行”。</p>
+<ol><li><code>Qwen3_5GatedDeltaNet.forward</code></li></ol>
+<p>why：layer event 只能说明选择了 <code>linear_attention</code>，此边界进一步证明 Qwen3.5 GDN helper 和 recurrent/cache 路径确实运行。</p>
+<p>join keys：layer key 加 <code>gdn_call_id</code>。</p>
+<p>fields：module prefix、phase、q/past/kv length、hidden/output shape、cache/state 是否存在及 shape 摘要、<code>duration_ns</code>。</p>
+<ol><li><code>RocmAiterUnifiedAttentionImpl.forward</code></li></ol>
+<p>why：证明 full-attention 层采用的真实 ROCm backend、GQA head layout 和 KV metadata。</p>
+<p>join keys：layer key 加 <code>attention_call_id</code>、<code>layer_name</code>、device。</p>
+<p>fields：backend/metadata type、q/past/kv length、24 query heads、4 KV heads、head dim 256、Q/K/V/output/cache/block/slot shape、cascade/common-prefix 摘要。</p>
+<ol><li><code>KVCacheManager.get_computed_blocks</code>、<code>allocate_slots</code>、<code>free</code>、<code>take_new_block_ids</code></li></ol>
+<p>why：四个操作分别覆盖 cache hit/reuse、分配、释放和新 block 物化。</p>
+<p>join keys：<code>schedule_id</code>、<code>batch_id</code>、<code>request_id</code>、本地 <code>cache_event_id</code>。</p>
+<p>fields：操作、hit、computed/new token 数、allocated/reused/freed block 数、各 cache group 的 table length、free block 与 usage 前后值、是否成功。</p>
+<ol><li><code>GPUModelRunner.sample_tokens</code>、<code>Sampler.forward</code> 和 host-side <code>Scheduler.update_from_output</code></li></ol>
+<p>why：worker/sampler 只证明调用和 shape；精确的小 token id、emitted count 和 finish reason 在 host-side scheduler output 处安全采集。</p>
+<p>join keys：<code>schedule_id</code>、<code>batch_id</code>、<code>forward_id</code>、<code>request_id</code>、<code>output_ordinal</code>。</p>
+<p>fields：请求数、logits/sample shape、sampling config、host-side token id、单次和累计 output count、finish/stop reason、result type。</p>
+<h3 id="Join-contract">Join contract</h3>
+<ul><li>每条事件都有 <code>run_id</code>、<code>contract_id</code>、source revision、<code>trace_mode</code>、进程内单调 <code>event_index</code>、PID/rank/worker/device。</li><li><code>engine_call_id</code> 不等同于 <code>forward_id</code>；异步 queue 中 schedule 和 update 也不要求相邻。</li><li><code>schedule_id</code> 绑定原始 <code>SchedulerOutput</code>；<code>batch_id</code> 由 CPU metadata 中的 <code>(request_id, num_computed_before, num_scheduled_tokens)</code> 规范化后计算。</li><li>batch 先计算逐请求 phase，再汇总为 prefill/decode/mixed/empty；不能仅以 batch 总 token 数推断。</li><li>benchmark token count 和 scheduler/template token count 分开命名，不能假设相等。</li><li>layer key 为 <code>(run, contract, rank, worker, forward_id, layer_idx, layer_occurrence)</code>；timestamp 不能单独作为 join key。</li></ul>
+<h2 id="Do-not-patch">Do not patch</h2>
+<ul><li>不 patch 所有搜索命中的 scheduler helper，也不 patch 所有 ATen/Triton/AITER/HIP/DCU kernel。</li><li>不 patch 与本问题无关的通用 MLP、norm、linear、embedding 和 LM head。</li><li>不把既存 GQA6、page784、LLMM1、TunableOp、M-RoPE 等优化专用事件当成本 R01 的通用 layer/selection 证据。</li><li>不保存 hidden/logits/KV cache/block table 等 tensor 内容，只保存 shape、dtype、device、count 和短 ID。</li><li>hot loop 中禁止 <code>.cpu()</code>、<code>.numpy()</code>、<code>.item()</code> 和 device-tensor <code>.tolist()</code>；精确 token id 只从已经在 host 侧的 scheduler output 获取。</li><li>compiled 模式缺少 Python wrapper 行时不得补造事件或推断层被跳过。</li></ul>
+<h2 id="Validation">Validation</h2>
+<ol><li>固定 <code>temperature=0</code>、<code>do_sample=false</code>、<code>seed=0</code> 的同一请求，比较无 wrapper、compiled-safe wrapper 和单独声明的 enforce-eager trace；completed、failed、generated text、input/output lengths 必须完全相等。</li><li>engine、model、attention begin/end key set 必须守恒；每个 <code>SchedulerOutput</code> 必须有同一 <code>schedule_id/batch_id</code> 的 schedule/update。</li><li>每个非空 eager forward 必须有 64 个 layer event：48 个 linear-attention、16 个 full-attention；GDN 和 full-attention helper 数分别与对应 layer 数一致。</li><li>所有长度明确的记录满足 <code>past_len + q_len == kv_len</code>；chunked prefill 的 computed/cache 状态在 decode 前单调推进。</li><li>cache allocated/reused/freed 数与 free-block 前后值可对账；正常完成以及范围内的 abort/preemption 必须能看到 free。</li><li>所有目标事件必须具备可连接的 key；不能依赖跨进程时间顺序。</li><li>静态检查 wrapper 不含 tensor 内容复制或设备同步；patch exception 只能形成显式 <code>patch_error</code>，不能改变原返回值。</li><li>当前固定 contract 的 single-request 验证已通过。该 contract 明确 <code>max_concurrency=1</code>，因此不声称并发覆盖；若下游扩大为一般 batched/concurrent serving，必须追加独立的两请求验证。</li></ol>
+<h2 id="Real-run-evidence-result">Real-run evidence result</h2>
+<ul><li>当前源码 HEAD 与证据 contract 都是 <code>3d03614452cd0a925abc82a7686560ff80252dfa</code>。</li><li>production baseline、compiled-instrumented、enforce-eager 三次输出完全一致：1 completed、0 failed、20574 benchmark input tokens、23 output tokens。</li><li>compiled trace：712 条事件、0 <code>patch_error</code>；layer/GDN Python wrapper 为 0，按实际 visibility gap 处理。</li><li>enforce-eager trace：8744 条事件、0 <code>patch_error</code>；29 个非空 forward（6 prefill + 23 decode），共 1856 个 layer event = <code>29 × 64</code>，其中 1392 个 linear-attention/GDN、464 个 full-attention。</li><li>6 个 prefill q length 为 <code>4096, 4096, 4096, 4096, 4096, 105</code>；23 个 decode q length 均为 1；全部 layer transition 满足 <code>past + q = kv</code>。</li><li>cache allocation transition 和最终 host output 已可见；既存 wrapper 未 patch <code>KVCacheManager.free</code>，所以 T08 明确补入该边界，未伪造释放证据。</li></ul>
+<p>完整机器可读计划、验证和证据哈希分别见 <code>patch_target_plan.json</code>、<code>validation_report.json</code>、<code>evidence_manifest.json</code>。</p></article></body></html>

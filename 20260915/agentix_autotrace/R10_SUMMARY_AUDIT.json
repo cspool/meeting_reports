@@ -1,0 +1,161 @@
+{
+  "purpose": "excerpt-selection criteria and windows for R10_SUMMARY figures",
+  "models": {
+    "llama": {
+      "part1": {
+        "criterion": "sliding 30 s window maximizing FCFS short-class (bfcl+sharegpt) wait mass",
+        "window_s": [
+          30.0,
+          60.0
+        ],
+        "short_wait_s": {
+          "fcfs": 63.844439430000016,
+          "core": 6.355022867000014
+        }
+      },
+      "part2": {
+        "call_pile": {
+          "universe": "call durations, lloyd 5 piles, top pile shown",
+          "fcfs": {
+            "n": 590,
+            "sum_s": 2765.479593612,
+            "short_members": 25
+          },
+          "core": {
+            "n": 339,
+            "sum_s": 1904.972365202,
+            "short_members": 20
+          }
+        },
+        "fwd_pile_window": {
+          "criterion": "densest section of FCFS rank-1 forward pile",
+          "section": 3
+        }
+      },
+      "part3": {
+        "lanes_window": {
+          "criterion": "30 s window with max FCFS time-at-cap",
+          "window_s": [
+            20.0,
+            50.0
+          ]
+        },
+        "microscope": {
+          "criterion": "busiest 300 ms (max kernel busy) inside the lanes window, per side",
+          "busy_pct": {
+            "fcfs": 22.560708333333334,
+            "core": 24.648702333333333
+          },
+          "gemm_pct": {
+            "fcfs": 17.26315,
+            "core": 16.654065666666668
+          }
+        }
+      }
+    },
+    "qwen3": {
+      "part1": {
+        "criterion": "sliding 30 s window maximizing FCFS short-class (bfcl+sharegpt) wait mass",
+        "window_s": [
+          30.0,
+          60.0
+        ],
+        "short_wait_s": {
+          "fcfs": 4.513454210999979,
+          "core": 1.4251177099999985
+        }
+      },
+      "part2": {
+        "call_pile": {
+          "universe": "call durations, lloyd 5 piles, top pile shown",
+          "fcfs": {
+            "n": 284,
+            "sum_s": 324.017826027,
+            "short_members": 24
+          },
+          "core": {
+            "n": 296,
+            "sum_s": 369.044310257,
+            "short_members": 22
+          }
+        },
+        "fwd_pile_window": {
+          "criterion": "densest section of FCFS rank-1 forward pile",
+          "section": 3
+        }
+      },
+      "part3": {
+        "lanes_window": {
+          "criterion": "30 s window with max FCFS time-at-cap",
+          "window_s": [
+            35.0,
+            65.0
+          ]
+        },
+        "microscope": {
+          "criterion": "busiest 300 ms (max kernel busy) inside the lanes window, per side",
+          "busy_pct": {
+            "fcfs": 18.747646333333336,
+            "core": 18.742890000000003
+          },
+          "gemm_pct": {
+            "fcfs": 11.545513999999999,
+            "core": 11.859622666666667
+          }
+        }
+      }
+    },
+    "qwenvl": {
+      "part1": {
+        "criterion": "sliding 30 s window maximizing FCFS short-class (bfcl+sharegpt) wait mass",
+        "window_s": [
+          35.0,
+          65.0
+        ],
+        "short_wait_s": {
+          "fcfs": 19.680333871000016,
+          "core": 2.108371831999961
+        }
+      },
+      "part2": {
+        "call_pile": {
+          "universe": "call durations, lloyd 5 piles, top pile shown",
+          "fcfs": {
+            "n": 387,
+            "sum_s": 761.200504159,
+            "short_members": 22
+          },
+          "core": {
+            "n": 341,
+            "sum_s": 742.242039229,
+            "short_members": 20
+          }
+        },
+        "fwd_pile_window": {
+          "criterion": "densest section of FCFS rank-1 forward pile",
+          "section": 3
+        }
+      },
+      "part3": {
+        "lanes_window": {
+          "criterion": "30 s window with max FCFS time-at-cap",
+          "window_s": [
+            45.0,
+            75.0
+          ]
+        },
+        "microscope": {
+          "criterion": "busiest 300 ms (max kernel busy) inside the lanes window, per side",
+          "busy_pct": {
+            "fcfs": 17.73464,
+            "core": 17.595971
+          },
+          "gemm_pct": {
+            "fcfs": 11.025382,
+            "core": 8.524556666666665
+          }
+        }
+      }
+    }
+  }
+}
